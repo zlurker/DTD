@@ -3,20 +3,26 @@
 
 #include "ProjectileTower.h"
 
-
-// Sets default values for this component's properties
-UProjectileTower::UProjectileTower()
+// Sets default values
+AProjectileTower::AProjectileTower()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
+ 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	PrimaryActorTick.bCanEverTick = true;
 
-	// ...
 }
 
-void UProjectileTower::TowerAction() {
+// Called when the game starts or when spawned
+void AProjectileTower::BeginPlay()
+{
+	Super::BeginPlay();
+	
+}
+
+
+void AProjectileTower::TowerAction() {
 	UE_LOG(LogTemp, Warning, TEXT("Tower firing."));
+
 	GetWorld()->SpawnActor(AProjectile::StaticClass());
-	UTowerBase::TowerAction();
+	ATower::TowerAction();
 }
 

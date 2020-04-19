@@ -4,29 +4,33 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Tower.h"
-#include "Engine/World.h"
-#include "Projectile.h"
-#include "ProjectileTower.generated.h"
+#include "Tower.generated.h"
 
 UCLASS()
-class DTD_API AProjectileTower : public ATower
+class DTD_API ATower : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	AProjectileTower();
+	ATower();
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	virtual void TowerAction() override;
+	virtual void TowerAction();
 
 public:	
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
 
-	// Common projectile tower stats
+public:
+	// Common tower stats
 	UPROPERTY(EditAnywhere, Category = "Stats")
-	class AActor* projectile;
+		float attackPeriod;
+
+private:
+	// Internal variables
+	float prevAction;
 
 };
