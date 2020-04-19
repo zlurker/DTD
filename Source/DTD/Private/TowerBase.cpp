@@ -30,5 +30,9 @@ void UTowerBase::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
+	TowerAction();
 }
 
+void UTowerBase::TowerAction() {
+	UE_LOG(LogTemp, Warning, TEXT("Tower actions."));
+}
