@@ -3,6 +3,7 @@
 
 #include "ProjectileTower.h"
 
+
 // Sets default values for this component's properties
 UProjectileTower::UProjectileTower()
 {
@@ -15,7 +16,7 @@ UProjectileTower::UProjectileTower()
 
 void UProjectileTower::TowerAction() {
 	UE_LOG(LogTemp, Warning, TEXT("Tower firing."));
-
+	GetWorld()->SpawnActor(AProjectile::StaticClass());
 	UTowerBase::TowerAction();
 }
 

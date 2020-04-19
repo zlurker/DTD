@@ -2,6 +2,7 @@
 
 
 #include "TowerBase.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values for this component's properties
 UTowerBase::UTowerBase()
@@ -30,7 +31,12 @@ void UTowerBase::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
-	TowerAction();
+	float currTime = UGameplayStatics::GetRealTimeSeconds((UObject*)GetWorld());
+
+	if (prevAction + attackPeriod <= currTime) {
+		prevAction = currTime;
+		TowerAction();
+	}
 }
 
 void UTowerBase::TowerAction() {

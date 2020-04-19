@@ -16,6 +16,8 @@ public:
 	// Sets default values for this component's properties
 	UTowerBase();
 
+	
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -25,5 +27,14 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-		
+
+public:
+	// Common tower stats
+	UPROPERTY(EditAnywhere, Category = "Stats")
+	float attackPeriod;
+
+
+private:
+	// Internal variables
+	float prevAction;		
 };
