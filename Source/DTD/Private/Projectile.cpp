@@ -3,8 +3,6 @@
 
 #include "Projectile.h"
 
-#include "Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h"
-
 // Sets default values
 AProjectile::AProjectile()
 {

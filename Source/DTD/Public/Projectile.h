@@ -5,14 +5,15 @@
 #include "CoreMinimal.h"
 #include "Engine/StaticMeshActor.h"
 #include "Runtime/Engine/Classes/Components/StaticMeshComponent.h "
+#include "Tower.h"
 #include "Projectile.generated.h"
 
 UCLASS()
 class DTD_API AProjectile : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	AProjectile();
 
@@ -23,7 +24,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 
 	UPROPERTY(EditAnywhere, Category = "Stats")
 		float projectileSpeed;
