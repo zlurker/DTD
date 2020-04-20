@@ -3,7 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "Engine/StaticMeshActor.h"
+#include "Runtime/Engine/Classes/Components/StaticMeshComponent.h "
 #include "Projectile.generated.h"
 
 UCLASS()
@@ -22,5 +23,9 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	void SetMesh(UStaticMesh* mesh);
 
+private:
+	// Internal use
+	UStaticMeshComponent* projectileMeshComponent;
 };

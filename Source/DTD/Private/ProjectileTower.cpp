@@ -6,7 +6,7 @@
 // Sets default values
 AProjectileTower::AProjectileTower()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 }
@@ -15,14 +15,20 @@ AProjectileTower::AProjectileTower()
 void AProjectileTower::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 
 void AProjectileTower::TowerAction() {
 	UE_LOG(LogTemp, Warning, TEXT("Tower firing."));
 
-	GetWorld()->SpawnActor(AProjectile::StaticClass());
+	AProjectile* inst = (AProjectile*)GetWorld()->SpawnActor(AProjectile::StaticClass());
+
+	//UStaticMeshComponent* mesh = Cast<UStaticMeshComponent>(projectile->GetComponentByClass(UStaticMeshComponent::StaticClass()));
+	//inst->SetMesh(mesh->GetStaticMesh());
+	//inst->GetStaticMeshComponent()->SetStaticMesh(projectile);
+
+	//*inst->CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TestMesh"));
 	ATower::TowerAction();
 }
 
