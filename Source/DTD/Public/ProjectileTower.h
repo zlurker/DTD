@@ -29,5 +29,5 @@ public:
 
 	// Common projectile tower stats
 	UPROPERTY(EditAnywhere, Category = "Stats")
-	class AStaticMeshActor* projectile;
+	class AActor* projectile;
 };

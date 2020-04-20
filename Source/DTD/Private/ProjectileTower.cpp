@@ -22,13 +22,11 @@ void AProjectileTower::BeginPlay()
 void AProjectileTower::TowerAction() {
 	UE_LOG(LogTemp, Warning, TEXT("Tower firing."));
 
-	AProjectile* inst = (AProjectile*)GetWorld()->SpawnActor(AProjectile::StaticClass());
-	//inst->Test("LOL");
-	//* test = 
-	inst->SetMesh(projectile->GetStaticMeshComponent()->GetStaticMesh());
-	//inst->GetStaticMeshComponent()->SetStaticMesh(projectile);
+	FActorSpawnParameters sP;
+	sP.Template = projectile;
+	
+	AProjectile* inst = (AProjectile*)GetWorld()->SpawnActor<AProjectile>(GetActorLocation(), GetActorRotation(),sP);
 
-	//*inst->CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TestMesh"));
 	ATower::TowerAction();
 }
 

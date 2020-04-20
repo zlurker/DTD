@@ -16,16 +16,15 @@ public:
 	// Sets default values for this actor's properties
 	AProjectile();
 
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-	void SetMesh(UStaticMesh* mesh);
 
-private:
-	// Internal use
-	UStaticMeshComponent* projectileMeshComponent;
+	UPROPERTY(EditAnywhere, Category = "Stats")
+		float projectileSpeed;
 };
