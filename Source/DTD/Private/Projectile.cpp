@@ -11,15 +11,15 @@ AProjectile::AProjectile()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	UStaticMeshComponent* projectileArt = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Projectile Art"));
-	projectileArt->SetupAttachment(RootComponent);
+	projectileMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Projectile Art"));
+	projectileMeshComponent->SetupAttachment(GetRootComponent());
 
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> projectileAsset(TEXT
+	/*static ConstructorHelpers::FObjectFinder<UStaticMesh> projectileAsset(TEXT
 	("/Game/Meshes/Gun_Turret01.Gun_Turret01"));
 
 	if (projectileAsset.Succeeded()) {
 		projectileArt->SetStaticMesh(projectileAsset.Object);
-	}
+	}*/
 }
 
 // Called when the game starts or when spawned
@@ -39,4 +39,5 @@ void AProjectile::Tick(float DeltaTime)
 void AProjectile::SetMesh(UStaticMesh* mesh) {
 	projectileMeshComponent->SetStaticMesh(mesh);
 }
+
 

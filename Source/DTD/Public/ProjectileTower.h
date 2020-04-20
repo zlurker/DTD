@@ -8,6 +8,7 @@
 #include "Engine/World.h"
 #include "Projectile.h"
 #include "Runtime/Engine/Classes/Components/StaticMeshComponent.h "
+#include "Engine/StaticMeshActor.h"
 #include "ProjectileTower.generated.h"
 
 UCLASS()
@@ -28,5 +29,5 @@ public:
 
 	// Common projectile tower stats
 	UPROPERTY(EditAnywhere, Category = "Stats")
-	class AActor* projectile;
+	class AStaticMeshActor* projectile;
 };

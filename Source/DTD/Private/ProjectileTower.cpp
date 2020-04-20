@@ -23,9 +23,9 @@ void AProjectileTower::TowerAction() {
 	UE_LOG(LogTemp, Warning, TEXT("Tower firing."));
 
 	AProjectile* inst = (AProjectile*)GetWorld()->SpawnActor(AProjectile::StaticClass());
-
-	//UStaticMeshComponent* mesh = Cast<UStaticMeshComponent>(projectile->GetComponentByClass(UStaticMeshComponent::StaticClass()));
-	//inst->SetMesh(mesh->GetStaticMesh());
+	//inst->Test("LOL");
+	//* test = 
+	inst->SetMesh(projectile->GetStaticMeshComponent()->GetStaticMesh());
 	//inst->GetStaticMeshComponent()->SetStaticMesh(projectile);
 
 	//*inst->CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TestMesh"));
