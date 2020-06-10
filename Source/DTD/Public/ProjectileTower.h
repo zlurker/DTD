@@ -9,6 +9,8 @@
 #include "Projectile.h"
 #include "Runtime/Engine/Classes/Components/StaticMeshComponent.h "
 #include "Engine/StaticMeshActor.h"
+#include "Kismet/GameplayStatics.h"
+#include "GameplayLevel.h"
 #include "ProjectileTower.generated.h"
 
 UCLASS()
