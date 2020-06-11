@@ -34,6 +34,6 @@ void ATower::Tick(float DeltaTime)
 }
 
 void ATower::TowerAction() {
-	UE_LOG(LogTemp, Warning, TEXT("Tower actions."));
+	//UE_LOG(LogTemp, Warning, TEXT("Tower actions."));
 }
 

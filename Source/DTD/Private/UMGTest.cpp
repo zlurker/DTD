@@ -6,4 +6,8 @@
 void AUMGTest::BeginPlay() {
 	Super::BeginPlay();
 	SetInputMode(FInputModeGameAndUI());
+
+	
 }
+
+

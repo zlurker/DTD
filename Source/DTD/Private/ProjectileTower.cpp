@@ -15,15 +15,12 @@ AProjectileTower::AProjectileTower()
 void AProjectileTower::BeginPlay()
 {
 	Super::BeginPlay();
-	AGameplayLevel* gameplayLevel = (AGameplayLevel*)UGameplayStatics::GetGameMode(GetWorld());
-
-	if (gameplayLevel != nullptr)
-		gameplayLevel->ReduceCash();
+	
 }
 
 
 void AProjectileTower::TowerAction() {
-	UE_LOG(LogTemp, Warning, TEXT("Tower firing."));
+	//UE_LOG(LogTemp, Warning, TEXT("Tower firing."));
 
 	FActorSpawnParameters sP;
 	sP.Template = projectile;
@@ -31,5 +28,10 @@ void AProjectileTower::TowerAction() {
 	AProjectile* inst = (AProjectile*)GetWorld()->SpawnActor<AProjectile>(GetActorLocation(), GetActorRotation(), sP);
 
 	ATower::TowerAction();
+
+	AGameplayLevel* gameplayLevel = (AGameplayLevel*)UGameplayStatics::GetGameMode(GetWorld());
+
+	//if (gameplayLevel != nullptr)
+		//gameplayLevel->ReduceCash();
 }
 
