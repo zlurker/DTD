@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "GameplayLevel.h"
+#include "Kismet/GameplayStatics.h"
 #include "UMGTest.generated.h"
 
 /**
@@ -16,4 +18,6 @@ class DTD_API AUMGTest : public APlayerController
 	
 	public:
 		virtual void BeginPlay() override;
+		virtual void SetupInputComponent() override;
+		void BuildTower();
 };

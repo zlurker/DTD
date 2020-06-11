@@ -46,10 +46,15 @@ void AGameplayLevel::ReduceCash() {
 void AGameplayLevel::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
 
-	if (selectedTowerType > -1) {
-		UE_LOG(LogTemp, Warning, TEXT("Tower type selected"));
+	
+}
 
-		FVector test;	
-		GetWorld()->GetFirstPlayerController()->DeprojectMousePositionToWorld(test, test);
+void AGameplayLevel::TriggerBuildTower() {
+	if (selectedTowerType > -1) {
+		UE_LOG(LogTemp, Warning, TEXT("Tower build triggered."));
+
+		//FVector test;	
+		//GetWorld()->GetFirstPlayerController()->DeprojectMousePositionToWorld(test, test);
 	}
+	
 }

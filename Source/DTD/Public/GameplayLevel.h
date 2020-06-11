@@ -23,6 +23,7 @@ public:
 		void BuildTower(int towerType);
 	//void ChangeMenuWidget(TSubclassOf<UUserWidget> NewWidgetClass);
 	void ReduceCash();
+	void TriggerBuildTower();
 	int selectedTowerType;
 
 
