@@ -5,7 +5,9 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 #include "Blueprint/UserWidget.h"
+#include "Tower.h"
 #include "GameplayLevel.generated.h"
+
 
 /**
  *
@@ -35,6 +37,9 @@ protected:
 	/** The widget class we will use as our menu when the game starts. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG Game")
 		TSubclassOf<UUserWidget> StartingWidgetClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UMG Game")
+		TArray<TSubclassOf<class ATower>> towers;
 
 	/** The widget instance that we are using as our menu. */
 	UPROPERTY()

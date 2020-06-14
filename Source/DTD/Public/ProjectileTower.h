@@ -31,5 +31,5 @@ public:
 
 	// Common projectile tower stats
 	UPROPERTY(EditAnywhere, Category = "Stats")
-	class AActor* projectile;
+		TSubclassOf<class AProjectile> projectile;
 };
