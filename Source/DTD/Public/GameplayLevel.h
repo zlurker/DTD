@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "Blueprint/UserWidget.h"
 #include "Tower.h"
+#include "DrawDebugHelpers.h"
 #include "GameplayLevel.generated.h"
 
 
@@ -25,7 +26,7 @@ public:
 		void BuildTower(int towerType);
 	//void ChangeMenuWidget(TSubclassOf<UUserWidget> NewWidgetClass);
 	void ReduceCash();
-	void TriggerBuildTower();
+	void TriggerBuildTower(FVector towerLoc);
 	int selectedTowerType;
 
 

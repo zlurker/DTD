@@ -49,12 +49,12 @@ void AGameplayLevel::Tick(float DeltaTime) {
 	
 }
 
-void AGameplayLevel::TriggerBuildTower() {
+void AGameplayLevel::TriggerBuildTower(FVector towerLoc) {
 	if (selectedTowerType > -1) {
 		UE_LOG(LogTemp, Warning, TEXT("Tower build triggered."));
-
-		//FVector test;	
-		//GetWorld()->GetFirstPlayerController()->DeprojectMousePositionToWorld(test, test);
+		ATower* inst = (ATower*) GetWorld()->SpawnActor(towers[selectedTowerType], &towerLoc);
+		 
+		selectedTowerType = 0;
 	}
 	
 }

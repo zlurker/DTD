@@ -19,5 +19,6 @@ class DTD_API AUMGTest : public APlayerController
 	public:
 		virtual void BeginPlay() override;
 		virtual void SetupInputComponent() override;
+		FVector CameraRaycastToObject();
 		void BuildTower();
 };
