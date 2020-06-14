@@ -29,11 +29,12 @@ public:
 	void TriggerBuildTower(FVector towerLoc);
 	int selectedTowerType;
 
+	UPROPERTY(EditAnywhere, Category = "Economy")
+		float playerCash;
 
 protected:
 	/** Called when the game starts. */
 	virtual void BeginPlay() override;
-	virtual void Tick(float DeltaTime) override;
 
 	/** The widget class we will use as our menu when the game starts. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG Game")

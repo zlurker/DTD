@@ -4,39 +4,26 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Tower.generated.h"
+#include "CreepBase.generated.h"
 
 UCLASS()
-class DTD_API ATower : public AActor
+class DTD_API ACreepBase : public AActor
 {
 	GENERATED_BODY()
-
-public:
+	
+public:	
 	// Sets default values for this actor's properties
-	ATower();
+	ACreepBase();
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	virtual void TowerAction();
 
-public:
+public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-public:
-	// Common tower stats
 	UPROPERTY(EditAnywhere, Category = "Stats")
-		float attackPeriod;
-
-	UPROPERTY(EditAnywhere, Category = "Stats")
-		float towerCost;
-
-	UPROPERTY(EditAnywhere, Category = "Tower Behaviour")
-		bool enableTargetting;
-
-private:
-	// Internal variables
-	float prevAction;
+		float health;
 
 };

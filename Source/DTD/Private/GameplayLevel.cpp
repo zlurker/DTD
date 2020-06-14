@@ -43,18 +43,12 @@ void AGameplayLevel::ReduceCash() {
 	//UE_LOG(LogTemp, Warning, TEXT("Cash has been reduced."));
 }
 
-void AGameplayLevel::Tick(float DeltaTime) {
-	Super::Tick(DeltaTime);
-
-	
-}
-
 void AGameplayLevel::TriggerBuildTower(FVector towerLoc) {
 	if (selectedTowerType > -1) {
 		UE_LOG(LogTemp, Warning, TEXT("Tower build triggered."));
 		ATower* inst = (ATower*) GetWorld()->SpawnActor(towers[selectedTowerType], &towerLoc);
 		 
-		selectedTowerType = 0;
+		selectedTowerType = -1;
 	}
 	
 }

@@ -27,5 +27,8 @@ protected:
 public:
 
 	UPROPERTY(EditAnywhere, Category = "Stats")
-		float projectileSpeed;
+		float damage;
+
+	AActor* target;
+
 };

@@ -6,6 +6,10 @@
 void AUMGTest::BeginPlay() {
 	Super::BeginPlay();
 	SetInputMode(FInputModeGameAndUI());
+
+	bShowMouseCursor = true;
+	bEnableClickEvents = true;
+	bEnableMouseOverEvents = true;
 }
 
 void AUMGTest::SetupInputComponent() {
