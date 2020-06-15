@@ -20,6 +20,7 @@ public:
 	// Sets default values for this actor's properties
 	ATower();
 
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -28,6 +29,15 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UFUNCTION()
+		void OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	/** called when something leaves the sphere component */
+	UFUNCTION()
+		void OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	bool SelectTarget();
 
 public:
 	// Common tower stats
@@ -43,15 +53,10 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Tower Behaviour")
 		bool enableTargetting;
 
-	UFUNCTION()
-		void OnOverlapBegin(class UPrimitiveComponent* OverlappedComp,class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
-	/** called when something leaves the sphere component */
-	UFUNCTION()
-		void OnOverlapEnd(class UPrimitiveComponent* OverlappedComp,class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 private:
 	// Internal variables
 	float prevAction;
 	USphereComponent* attackRadius;
 	TArray<AActor*> aqquiredTargets;
+	AActor* currentTarget;
 };

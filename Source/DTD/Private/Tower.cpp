@@ -29,7 +29,7 @@ void ATower::BeginPlay()
 	TArray<AActor*> ignoreActors;
 
 	UClass* seekClass = ACreepBase::StaticClass();
-	
+
 
 	UKismetSystemLibrary::SphereOverlapActors(GetWorld(), GetActorLocation(), towerAttackRadius, traceObjectTypes, seekClass, ignoreActors, aqquiredTargets);
 
@@ -46,20 +46,50 @@ void ATower::Tick(float DeltaTime)
 	float currTime = UGameplayStatics::GetRealTimeSeconds((UObject*)GetWorld());
 
 	if (prevAction + attackPeriod <= currTime) {
+
+		if (enableTargetting)
+			if (currentTarget == nullptr) {
+				if (!SelectTarget())
+					return;
+			}
+
 		prevAction = currTime;
 		TowerAction();
 	}
+}
+
+bool ATower::SelectTarget() {
+
+	if (aqquiredTargets.Num() > 0) {
+		int nearestTarget = 0;
+		float lowestDotProduct = FVector::DotProduct(aqquiredTargets[0]->GetActorLocation(), GetActorLocation());
+
+		if (aqquiredTargets.Num() > 1) 
+			for (int i = 1; i < aqquiredTargets.Num(); i++) {
+				float currDp = FVector::DotProduct(aqquiredTargets[i]->GetActorLocation(), GetActorLocation());
+
+				if (currDp < lowestDotProduct)
+					lowestDotProduct = currDp;
+			}
+		
+		currentTarget = aqquiredTargets[nearestTarget];
+		UE_LOG(LogTemp, Log, TEXT("Target Aqquired: %s"), *currentTarget->GetName());
+		return true;
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("No target aqquired."));
+	return false;
 }
 
 void ATower::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
 {
 	ACreepBase* creep = Cast<ACreepBase>(OtherActor);
 
-	UE_LOG(LogTemp, Log, TEXT("Something came in contact."));
+	//UE_LOG(LogTemp, Log, TEXT("Something came in contact."));
 
 	if (creep != nullptr) {
 		aqquiredTargets.Add(OtherActor);
-		UE_LOG(LogTemp, Log, TEXT("Creep is in range. Adding to array... Current creep aqquired: %d"), aqquiredTargets.Num());	
+		UE_LOG(LogTemp, Log, TEXT("Creep is in range. Adding to array... Current creep aqquired: %d"), aqquiredTargets.Num());
 	}
 
 }
@@ -68,9 +98,12 @@ void ATower::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, AActor * Ot
 {
 	ACreepBase* creep = Cast<ACreepBase>(OtherActor);
 
-	UE_LOG(LogTemp, Log, TEXT("Something has left range of tower."));
+	//UE_LOG(LogTemp, Log, TEXT("Something has left range of tower."));
 
 	if (creep != nullptr) {
+		if (creep == currentTarget)
+			currentTarget = nullptr;
+
 		aqquiredTargets.Remove(OtherActor);
 		UE_LOG(LogTemp, Log, TEXT("Creep is out of range. Removing from array... Current creep aqquired: %d"), aqquiredTargets.Num());
 	}
