@@ -4,6 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/GameplayStatics.h"
+#include "Components/SphereComponent.h"
+#include "Components/StaticMeshComponent.h"
 #include "Tower.generated.h"
 
 UCLASS()
@@ -32,11 +36,15 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Stats")
 		float towerCost;
 
+	UPROPERTY(EditAnywhere, Category = "Stats")
+		float towerAttackRadius;
+
 	UPROPERTY(EditAnywhere, Category = "Tower Behaviour")
 		bool enableTargetting;
 
+	
 private:
 	// Internal variables
 	float prevAction;
-
+	USphereComponent* attackRadius;
 };

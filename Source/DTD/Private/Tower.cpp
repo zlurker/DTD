@@ -2,8 +2,6 @@
 
 
 #include "Tower.h"
-#include "Kismet/GameplayStatics.h"
-
 
 // Sets default values
 ATower::ATower()
@@ -11,12 +9,17 @@ ATower::ATower()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	attackRadius = CreateDefaultSubobject<USphereComponent>(TEXT("Tower Attack Radius"));
+	attackRadius->SetupAttachment(RootComponent);
+	attackRadius->bHiddenInGame = false;
+	
 }
 
 // Called when the game starts or when spawned
 void ATower::BeginPlay()
 {
 	Super::BeginPlay();	
+	attackRadius->SetSphereRadius(towerAttackRadius);
 }
 
 // Called every frame
@@ -30,6 +33,8 @@ void ATower::Tick(float DeltaTime)
 		prevAction = currTime;
 		TowerAction();
 	}
+
+
 
 }
 
