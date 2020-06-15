@@ -43,6 +43,12 @@ void ATower::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (currentTarget != nullptr) {
+		FRotator rotate = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), currentTarget->GetActorLocation());
+		
+		SetActorRotation(rotate);
+	}
+
 	float currTime = UGameplayStatics::GetRealTimeSeconds((UObject*)GetWorld());
 
 	if (prevAction + attackPeriod <= currTime) {
@@ -62,14 +68,16 @@ bool ATower::SelectTarget() {
 
 	if (aqquiredTargets.Num() > 0) {
 		int nearestTarget = 0;
-		float lowestDotProduct = FVector::DotProduct(aqquiredTargets[0]->GetActorLocation(), GetActorLocation());
+		float shortestDist = FVector::DotProduct(aqquiredTargets[0]->GetActorLocation(), GetActorLocation());
 
 		if (aqquiredTargets.Num() > 1) 
 			for (int i = 1; i < aqquiredTargets.Num(); i++) {
-				float currDp = FVector::DotProduct(aqquiredTargets[i]->GetActorLocation(), GetActorLocation());
+				float currDist = (aqquiredTargets[i]->GetActorLocation() - GetActorLocation()).Size(); //FVector::DotProduct(aqquiredTargets[i]->GetActorLocation(), GetActorLocation());
 
-				if (currDp < lowestDotProduct)
-					lowestDotProduct = currDp;
+				if (currDist < shortestDist) {
+					nearestTarget = i;
+					shortestDist = currDist;
+				}
 			}
 		
 		currentTarget = aqquiredTargets[nearestTarget];

@@ -19,6 +19,7 @@ public:
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	void SetTarget(AActor* towerTarget);
 
 protected:
 	// Called when the game starts or when spawned
@@ -29,6 +30,11 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Stats")
 		float damage;
 
+	UPROPERTY(EditAnywhere, Category = "Projectile Behaviour")
+		bool seeking;
+
+private:
 	AActor* target;
+	FVector direction;
 
 };

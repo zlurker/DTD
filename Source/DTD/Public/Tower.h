@@ -8,6 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "CreepBase.h"
 #include "Tower.generated.h"
 
@@ -53,10 +54,12 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Tower Behaviour")
 		bool enableTargetting;
 
+protected:
+	AActor* currentTarget;
+
 private:
 	// Internal variables
 	float prevAction;
 	USphereComponent* attackRadius;
 	TArray<AActor*> aqquiredTargets;
-	AActor* currentTarget;
 };

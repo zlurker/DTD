@@ -24,13 +24,12 @@ void AProjectileTower::TowerAction() {
 
 	//FActorSpawnParameters sP;
 	//sP.Template = projectile;
-
+	Super::TowerAction();
 	
 	AProjectile* inst = (AProjectile*)GetWorld()->SpawnActor(projectile);
-
-	ATower::TowerAction();
-
-	AGameplayLevel* gameplayLevel = (AGameplayLevel*)UGameplayStatics::GetGameMode(GetWorld());
+	inst->SetActorLocation(GetActorLocation());
+	inst->SetTarget(currentTarget);
+	//AGameplayLevel* gameplayLevel = (AGameplayLevel*)UGameplayStatics::GetGameMode(GetWorld());
 
 	//if (gameplayLevel != nullptr)
 		//gameplayLevel->ReduceCash();
