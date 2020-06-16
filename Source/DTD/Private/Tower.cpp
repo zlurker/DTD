@@ -68,7 +68,7 @@ bool ATower::SelectTarget() {
 
 	if (aqquiredTargets.Num() > 0) {
 		int nearestTarget = 0;
-		float shortestDist = FVector::DotProduct(aqquiredTargets[0]->GetActorLocation(), GetActorLocation());
+		float shortestDist = (aqquiredTargets[0]->GetActorLocation() - GetActorLocation()).Size();
 
 		if (aqquiredTargets.Num() > 1) 
 			for (int i = 1; i < aqquiredTargets.Num(); i++) {
@@ -85,7 +85,7 @@ bool ATower::SelectTarget() {
 		return true;
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("No target aqquired."));
+	//UE_LOG(LogTemp, Log, TEXT("No target aqquired."));
 	return false;
 }
 

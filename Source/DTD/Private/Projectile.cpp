@@ -33,6 +33,33 @@ void AProjectile::BeginPlay()
 			break;
 		}
 	}
+
+	TArray<UShapeComponent*> projectileColliders;
+	GetComponents<UShapeComponent>(projectileColliders);
+
+	for (UShapeComponent* collider : projectileColliders) {
+		UE_LOG(LogTemp, Log, TEXT("Collision set up."));
+
+		if (collider != nullptr) {
+			UE_LOG(LogTemp, Log, TEXT("Collision exist."));
+			collider->OnComponentBeginOverlap.AddDynamic(this, &AProjectile::OnOverlapBegin);
+		}
+	}
+}
+
+void AProjectile::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
+{
+	ACreepBase* creep = Cast<ACreepBase>(OtherActor);
+
+	UE_LOG(LogTemp, Log, TEXT("Something came in contact with projectile."));
+
+	if (creep != nullptr) {
+		//aqquiredTargets.Add(OtherActor);
+		for (UProjectileEffectBase* effect : onHit)
+			effect->ApplyEffect(target);
+		UE_LOG(LogTemp, Log, TEXT("Performing hit actions."));
+	}
+
 }
 
 // Called every frame
@@ -40,28 +67,11 @@ void AProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (target != nullptr) {
-
-		FVector dir = direction;
-
-		if (seeking) {
-			dir = target->GetActorLocation() - GetActorLocation();
-			dir.Normalize(0);
-		}
-
-		SetActorLocation(GetActorLocation() + dir);
-	}
-
 	for (UProjectileEffectBase* effect : onUpdate)
 		effect->ApplyEffect(target);
 }
 
 void AProjectile::SetTarget(AActor* towerTarget) {
 	target = towerTarget;
-
-	if (!seeking && target != nullptr) {
-		direction = target->GetActorLocation() - GetActorLocation();
-		direction.Normalize();
-	}
 }
 
