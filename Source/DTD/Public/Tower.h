@@ -61,5 +61,5 @@ private:
 	// Internal variables
 	float prevAction;
 	USphereComponent* attackRadius;
-	TArray<AActor*> aqquiredTargets;
+	TArray<AActor*> aqquiredTargets;	
 };

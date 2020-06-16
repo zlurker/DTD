@@ -6,6 +6,7 @@
 #include "Engine/StaticMeshActor.h"
 #include "Runtime/Engine/Classes/Components/StaticMeshComponent.h "
 #include "Tower.h"
+#include "ProjectileEffectBase.h"
 #include "Projectile.generated.h"
 
 UCLASS()
@@ -36,5 +37,7 @@ public:
 private:
 	AActor* target;
 	FVector direction;
-
+	
+	TArray<UProjectileEffectBase*> onUpdate;
+	TArray<UProjectileEffectBase*> onHit;
 };
