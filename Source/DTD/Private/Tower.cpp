@@ -36,6 +36,8 @@ void ATower::BeginPlay()
 	UE_LOG(LogTemp, Log, TEXT("Tower initialised... Current creep aqquired: %d"), aqquiredTargets.Num());
 	//for (AActor* overlappedActor : aqquiredTargets)
 		//UE_LOG(LogTemp, Log, TEXT("OverlappedActor: %s"), *overlappedActor->GetName());
+
+	prevAction = -attackPeriod;
 }
 
 // Called every frame
@@ -44,19 +46,21 @@ void ATower::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	if (currentTarget != nullptr) {
-		FRotator rotate = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), currentTarget->GetActorLocation());
-		
+		FRotator rotate = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), currentTarget->GetActorLocation());		
 		SetActorRotation(rotate);
 	}
 
 	float currTime = UGameplayStatics::GetRealTimeSeconds((UObject*)GetWorld());
 
 	if (prevAction + attackPeriod <= currTime) {
-
 		if (enableTargetting)
 			if (currentTarget == nullptr) {
 				if (!SelectTarget())
 					return;
+				
+				// Updates rotation on current frame.
+				FRotator rotate = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), currentTarget->GetActorLocation());
+				SetActorRotation(rotate);
 			}
 
 		prevAction = currTime;

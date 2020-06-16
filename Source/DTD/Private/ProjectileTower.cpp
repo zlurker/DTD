@@ -26,8 +26,7 @@ void AProjectileTower::TowerAction() {
 	//sP.Template = projectile;
 	Super::TowerAction();
 	
-	AProjectile* inst = (AProjectile*)GetWorld()->SpawnActor(projectile);
-	inst->SetActorLocation(GetActorLocation());
+	AProjectile* inst = GetWorld()->SpawnActor<AProjectile>(projectile,GetActorLocation(),GetActorRotation());
 	inst->SetTarget(currentTarget);
 	//AGameplayLevel* gameplayLevel = (AGameplayLevel*)UGameplayStatics::GetGameMode(GetWorld());
 

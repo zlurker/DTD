@@ -7,6 +7,7 @@
 #include "Runtime/Engine/Classes/Components/StaticMeshComponent.h "
 #include "Tower.h"
 #include "ProjectileEffectBase.h"
+#include "CreepBase.h"
 #include "Projectile.generated.h"
 
 UCLASS()

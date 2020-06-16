@@ -51,13 +51,15 @@ void AProjectile::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, AAct
 {
 	ACreepBase* creep = Cast<ACreepBase>(OtherActor);
 
-	UE_LOG(LogTemp, Log, TEXT("Something came in contact with projectile."));
+	//UE_LOG(LogTemp, Log, TEXT("Something came in contact with projectile."));
 
 	if (creep != nullptr) {
 		//aqquiredTargets.Add(OtherActor);
 		for (UProjectileEffectBase* effect : onHit)
 			effect->ApplyEffect(target);
+
 		UE_LOG(LogTemp, Log, TEXT("Performing hit actions."));
+		UE_LOG(LogTemp, Log, TEXT("OverlappedActor: %s"), *creep->GetName());
 	}
 
 }
