@@ -30,14 +30,6 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:
-
-	UPROPERTY(EditAnywhere, Category = "Stats")
-		float damage;
-
-	UPROPERTY(EditAnywhere, Category = "Projectile Behaviour")
-		bool seeking;
-
 private:
 	AActor* target;
 

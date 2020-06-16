@@ -25,3 +25,10 @@ void ACreepBase::Tick(float DeltaTime)
 
 }
 
+void ACreepBase::ModifyHealth(float value) {
+	health -= value;
+
+	if (health <= 0)
+		Destroy();
+}
+

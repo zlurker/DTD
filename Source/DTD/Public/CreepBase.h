@@ -22,6 +22,9 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	void ModifyHealth(float value);
+
+public:
 
 	UPROPERTY(EditAnywhere, Category = "Stats")
 		float health;
