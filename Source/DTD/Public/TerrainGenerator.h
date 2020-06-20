@@ -16,16 +16,23 @@ public:
 	// Sets default values for this actor's properties
 	ATerrainGenerator();
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	UPROPERTY(VisibleAnywhere, Category = "MyProceduralMesh")
+		UProceduralMeshComponent* pm;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	UPROPERTY()
+		TArray<FVector> vertices;
+	UPROPERTY()
+		TArray<FVector> normals;
+	UPROPERTY()
+		TArray<int32> triangles;
+	UPROPERTY()
+		TArray<FVector2D> uvs;
+	UPROPERTY()
+		TArray<FLinearColor> vertexColors;
+	UPROPERTY()
+		TArray<FProcMeshTangent> tangents;
 
-private:
-	UPROPERTY(VisibleAnywhere, Category = Materials)
-		class UProceduralMeshComponent* mesh;
+	virtual void OnConstruction(const FTransform& Transform) override;
 
+	void ClearMeshData();
 };
