@@ -8,10 +8,11 @@
 			"Name": "DTD",
 			"Type": "Runtime",
 			"LoadingPhase": "Default",
-			"AdditionalDependencies": [
-				"Engine",
-				"UMG"
-			]
+      "AdditionalDependencies": [
+        "Engine",
+        "UMG",
+        "ProceduralMeshComponent"
+      ]
 		}
 	]
 }
