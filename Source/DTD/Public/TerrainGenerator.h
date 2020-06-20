@@ -5,14 +5,15 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "ProceduralMeshComponent.h"
+#include "RoomProceduralGenerator.h"
 #include "TerrainGenerator.generated.h"
 
 UCLASS()
 class DTD_API ATerrainGenerator : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	ATerrainGenerator();
 
@@ -31,6 +32,15 @@ public:
 		TArray<FLinearColor> vertexColors;
 	UPROPERTY()
 		TArray<FProcMeshTangent> tangents;
+
+	UPROPERTY(EditAnywhere, Category = "Generation Settings")
+		int verticeDimensionX = 20;
+
+	UPROPERTY(EditAnywhere, Category = "Generation Settings")
+		int verticeDimensionY = 20;
+
+	UPROPERTY(EditAnywhere, Category = "Generation Settings")
+		float plotSpace = 100;
 
 	virtual void OnConstruction(const FTransform& Transform) override;
 

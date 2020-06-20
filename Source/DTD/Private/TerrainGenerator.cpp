@@ -16,25 +16,62 @@ void ATerrainGenerator::OnConstruction(const FTransform& Transform)
 {
 	ClearMeshData();
 
-	vertices.Add(FVector(0.0f, 0.0f, 0.0f));
-	vertices.Add(FVector(100.0f, 0.0f, 0.0f));
+	// Populates vertices.
+	for (int i = 0; i < verticeDimensionX; i++)
+		for (int j = 0; j < verticeDimensionY; j++)
+			vertices.Add(FVector(plotSpace * i, plotSpace * j, FMath::RandRange(-200, 200)));
+
+	// Begins linkage creation
+	for (int i = 0; i < verticeDimensionX - 1; i++)
+		for (int j = 0; j < verticeDimensionY - 1; j++) {
+
+			int index0 = (i * verticeDimensionY) + j;
+			int index1 = index0 + 1;
+			int index2 = index0 + verticeDimensionY;
+			int index3 = index2 + 1;
+
+			triangles.Add(index0);
+			triangles.Add(index1);
+			triangles.Add(index2);
+
+			triangles.Add(index3);
+			triangles.Add(index2);
+			triangles.Add(index1);
+		}
+
+	/*vertices.Add(FVector(0.0f, 0.0f, 0.0f));
 	vertices.Add(FVector(0.0f, 100.0f, 0.0f));
+	vertices.Add(FVector(100.0f, 0.0f, 0.0f));
+	vertices.Add(FVector(100.0f, 100.0f, 0.0f));
 
 	triangles.Add(0);
-	triangles.Add(2);
 	triangles.Add(1);
+	triangles.Add(2);
+
+	triangles.Add(3);
+	triangles.Add(2);
+	triangles.Add(1);*/
+
+	normals.Init(FVector(1, 0.0f, 0.0f), 4);
 
 	uvs.Add(FVector2D(0.0f, 0.0f));
 	uvs.Add(FVector2D(1.0f, 0.0f));
 	uvs.Add(FVector2D(0.0f, 1.0f));
+	uvs.Add(FVector2D(1.0f, 1.0f));
 
 	//uvs.Init(FVector2D(0.0f, 0.0f), 3);
-	normals.Init(FVector(0.0f, 0.0f, 1.0f), 3);
-	vertexColors.Init(FLinearColor(0.0f, 0.0f, 0.0f, 1.0f), 3);
-	tangents.Init(FProcMeshTangent(1.0f, 0.0f, 0.0f), 3);
+
+	//vertexColors.Init(FLinearColor(0.75f, 0.0f, 0.0f, 1.0f), 4);
+
+	vertexColors.Add(FLinearColor(1, 0, 0, 1.0));
+	vertexColors.Add(FLinearColor(1, 0, 0, 1.0));
+	vertexColors.Add(FLinearColor(0, 1, 0, 1.0));                              // the 4th argument determines alpha value (0,1)
+	vertexColors.Add(FLinearColor(1, 1, 0, 1.0));
+
+	tangents.Init(FProcMeshTangent(0.0f, 1.0f, 0.0f), 4);
 
 	//Function that creates mesh section
-	pm->CreateMeshSection_LinearColor(0, vertices, triangles, normals, uvs, vertexColors, tangents, false);
+	pm->CreateMeshSection_LinearColor(1, vertices, triangles, normals, uvs, vertexColors, tangents, false);
 }
 
 
