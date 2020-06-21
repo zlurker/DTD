@@ -44,6 +44,8 @@ public:
 		float plotSpace = 100;
 
 	virtual void OnConstruction(const FTransform& Transform) override;
+	void GetCoordinatePosition(int index, int* coordinates);
+	int GetIndex(int* coordinates);
 
 	void ClearMeshData();
 };

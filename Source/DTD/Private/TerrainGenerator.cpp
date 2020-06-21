@@ -17,28 +17,92 @@ void ATerrainGenerator::OnConstruction(const FTransform& Transform)
 	ClearMeshData();
 
 
-	int chasmCount = 5;
-	float hillRatio = 0.2f;
-	int hillCount = 5;
-
+	float chasmRatio = 0.2f;
+	int chasmCount = 1;
 	int totalVertices = verticeDimensionX * verticeDimensionY;
 
 	// Populates vertices.
 	for (int i = 0; i < verticeDimensionX; i++)
-		for (int j = 0; j < verticeDimensionY; j++) {
-			UE_LOG(LogTemp, Log, TEXT("Perlin Float Test : %f"), FMath::PerlinNoise2D(FVector2D(i * 0.05f, j * 0.05f)) * 1000);
-			vertices.Add(FVector(plotSpace * i, plotSpace * j, FMath::PerlinNoise2D(FVector2D(i * 0.05f, j * 0.05f)) * 1000));
-		}
+		for (int j = 0; j < verticeDimensionY; j++)
+			// Perlin noise to give terrain a more rocky feel
+			vertices.Add(FVector(plotSpace * i, plotSpace * j, FMath::PerlinNoise2D(FVector2D(i * 0.05f, j * 0.05f)) * 200));
+
 
 	// Adds chasms
-	//int remainingPoints = totalVertices * hillRatio;
+	int remainingPoints = totalVertices * chasmRatio;
 
-	//for (int i = 0; i < chasmCount; i++) {
-		//int pointsUsed = FMath::RandRange(0, remainingPoints);
+	for (int i = 0; i < chasmCount; i++) {
+		int pointsUsed = i == chasmCount - 1 ? remainingPoints : FMath::RandRange(0, remainingPoints);
+		int randPt = FMath::RandRange(0, totalVertices);
+		TArray<int> expansion;
+		expansion.Init(randPt, 8);
+		UE_LOG(LogTemp, Log, TEXT("Building chasm. Points used: %d/%d"), pointsUsed, remainingPoints);
 
+		for (int j = 0; j < pointsUsed; j++) {
 
-		//remainingPoints -= pointsUsed;
-	//}
+			int randDir = FMath::RandRange(0, 7);
+			int currCoor[2];
+			GetCoordinatePosition(expansion[randDir], currCoor);
+			int nextCoord = -1;
+
+			//UE_LOG(LogTemp, Log, TEXT("CoordX: %d, CoordY: %d"), currCoor[0], currCoor[1]);
+
+			switch (randDir) {
+			case 0:
+				currCoor[1] += 1;
+				nextCoord = GetIndex(currCoor);
+				break;
+
+			case 1:
+				currCoor[0] += 1;
+				currCoor[1] += 1;
+				nextCoord = GetIndex(currCoor);
+				break;
+
+			case 2:
+				currCoor[0] += 1;
+				nextCoord = GetIndex(currCoor);
+				break;
+
+			case 3:
+				currCoor[0] += 1;
+				currCoor[1] += -1;
+				nextCoord = GetIndex(currCoor);
+				break;
+
+			case 4:
+				currCoor[1] += -1;
+				nextCoord = GetIndex(currCoor);
+				break;
+
+			case 5:
+				currCoor[0] += -1;
+				currCoor[1] += -1;
+				nextCoord = GetIndex(currCoor);
+				break;
+
+			case 6:
+				currCoor[0] += -1;
+				nextCoord = GetIndex(currCoor);
+				break;
+
+			case 7:
+				currCoor[0] += -1;
+				currCoor[1] += 1;
+				nextCoord = GetIndex(currCoor);
+				break;
+			}
+
+			if (nextCoord < 0 || nextCoord >= totalVertices)
+				continue;
+
+			vertices[nextCoord].Z = -500;
+			//UE_LOG(LogTemp, Log, TEXT("This coord has been modified: %d"), nextCoord);
+			expansion[randDir] = nextCoord;
+		}
+
+		remainingPoints -= pointsUsed;
+	}
 
 	// Adds hilly terrain
 
@@ -95,6 +159,15 @@ void ATerrainGenerator::OnConstruction(const FTransform& Transform)
 
 	//Function that creates mesh section
 	pm->CreateMeshSection_LinearColor(1, vertices, triangles, normals, uvs, vertexColors, tangents, false);
+}
+
+void ATerrainGenerator::GetCoordinatePosition(int index, int* coordinates) {
+	coordinates[1] = index % verticeDimensionX;
+	coordinates[0] = (index - coordinates[1]) / verticeDimensionX;
+}
+
+int ATerrainGenerator::GetIndex(int* coordinates) {
+	return (coordinates[0] * verticeDimensionX) + coordinates[1];
 }
 
 
