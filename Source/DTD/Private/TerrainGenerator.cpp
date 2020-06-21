@@ -16,10 +16,31 @@ void ATerrainGenerator::OnConstruction(const FTransform& Transform)
 {
 	ClearMeshData();
 
+
+	int chasmCount = 5;
+	float hillRatio = 0.2f;
+	int hillCount = 5;
+
+	int totalVertices = verticeDimensionX * verticeDimensionY;
+
 	// Populates vertices.
 	for (int i = 0; i < verticeDimensionX; i++)
-		for (int j = 0; j < verticeDimensionY; j++)
-			vertices.Add(FVector(plotSpace * i, plotSpace * j, FMath::RandRange(-200, 200)));
+		for (int j = 0; j < verticeDimensionY; j++) {
+			UE_LOG(LogTemp, Log, TEXT("Perlin Float Test : %f"), FMath::PerlinNoise2D(FVector2D(i * 0.05f, j * 0.05f)) * 1000);
+			vertices.Add(FVector(plotSpace * i, plotSpace * j, FMath::PerlinNoise2D(FVector2D(i * 0.05f, j * 0.05f)) * 1000));
+		}
+
+	// Adds chasms
+	//int remainingPoints = totalVertices * hillRatio;
+
+	//for (int i = 0; i < chasmCount; i++) {
+		//int pointsUsed = FMath::RandRange(0, remainingPoints);
+
+
+		//remainingPoints -= pointsUsed;
+	//}
+
+	// Adds hilly terrain
 
 	// Begins linkage creation
 	for (int i = 0; i < verticeDimensionX - 1; i++)
@@ -29,6 +50,8 @@ void ATerrainGenerator::OnConstruction(const FTransform& Transform)
 			int index1 = index0 + 1;
 			int index2 = index0 + verticeDimensionY;
 			int index3 = index2 + 1;
+
+			//vertices[i] = -1;
 
 			triangles.Add(index0);
 			triangles.Add(index1);

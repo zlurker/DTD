@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "ProceduralMeshComponent.h"
 #include "RoomProceduralGenerator.h"
+#include "Math/UnrealMathUtility.h"
 #include "TerrainGenerator.generated.h"
 
 UCLASS()
@@ -34,10 +35,10 @@ public:
 		TArray<FProcMeshTangent> tangents;
 
 	UPROPERTY(EditAnywhere, Category = "Generation Settings")
-		int verticeDimensionX = 20;
+		int verticeDimensionX = 100;
 
 	UPROPERTY(EditAnywhere, Category = "Generation Settings")
-		int verticeDimensionY = 20;
+		int verticeDimensionY = 100;
 
 	UPROPERTY(EditAnywhere, Category = "Generation Settings")
 		float plotSpace = 100;
