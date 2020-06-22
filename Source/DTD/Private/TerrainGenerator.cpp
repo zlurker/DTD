@@ -16,20 +16,35 @@ void ATerrainGenerator::OnConstruction(const FTransform& Transform)
 {
 	ClearMeshData();
 
-
-	float chasmRatio = 0.2f;
-	int chasmCount = 1;
-	int totalVertices = verticeDimensionX * verticeDimensionY;
+	int radius = 20;
 
 	// Populates vertices.
 	for (int i = 0; i < verticeDimensionX; i++)
-		for (int j = 0; j < verticeDimensionY; j++)
+		for (int j = 0; j < verticeDimensionY; j++) 
 			// Perlin noise to give terrain a more rocky feel
-			vertices.Add(FVector(plotSpace * i, plotSpace * j, FMath::PerlinNoise2D(FVector2D(i * 0.05f, j * 0.05f)) * 200));
+			vertices.Add(FVector(plotSpace * i, plotSpace * j, 0));
+		
+
+	int centerX = verticeDimensionX / 2;
+	int centerY = verticeDimensionY / 2;
+
+	for (float rad = 0; rad < 6.28318531; rad += 0.1) {
+		//float pN = FMath::PerlinNoise1D(rad);
+		//float value = FMath::PerlinNoise2D(FVector2D(i * 0.01f, j * 0.01f));
+
+		//float finalZ = value >= 0 ? 500 : -500;
+		int x = radius * FMath::Sin(rad);
+		int y = radius * FMath::Cos(rad);
+		int coordinates[2];
+
+		coordinates[0] = centerX + x;
+		coordinates[1] = centerY + y;
+		vertices[GetIndex(coordinates)].Z = -500;
+	}
 
 
 	// Adds chasms
-	int remainingPoints = totalVertices * chasmRatio;
+	/*int remainingPoints = totalVertices * chasmRatio;
 
 	for (int i = 0; i < chasmCount; i++) {
 		int pointsUsed = i == chasmCount - 1 ? remainingPoints : FMath::RandRange(0, remainingPoints);
@@ -38,7 +53,29 @@ void ATerrainGenerator::OnConstruction(const FTransform& Transform)
 		expansion.Init(randPt, 8);
 		UE_LOG(LogTemp, Log, TEXT("Building chasm. Points used: %d/%d"), pointsUsed, remainingPoints);
 
-		for (int j = 0; j < pointsUsed; j++) {
+		int randLineLen = FMath::RandRange(0, verticeDimensionY);
+		int randLineLenPosX = FMath::RandRange(0, verticeDimensionX);
+		int randLineLenPosY = FMath::RandRange(0, verticeDimensionY);
+
+		for (int j = randLineLenPosY; j < randLineLenPosY + randLineLen; j++) {
+			int pointsUsedForChasm = j == randLineLenPosY + randLineLen - 1 ? pointsUsedForChasm : FMath::RandRange(0, pointsUsed);
+			//int randOffset = FMath::RandRange(0, pointsUsedForChasm);
+
+			for (int k = randLineLenPosX; k < randLineLenPosX + pointsUsedForChasm; k++) {
+				int coords[2];
+				coords[0] = k;
+				coords[1] = j;
+
+				if (k < 0 || k >= verticeDimensionX || j < 0 || j >= verticeDimensionY)
+					continue;
+				vertices[GetIndex(coords)].Z = -500;
+			}
+
+			pointsUsed -= pointsUsedForChasm;
+		}*/
+
+
+		/*for (int j = 0; j < pointsUsed; j++) {
 
 			int randDir = FMath::RandRange(0, 7);
 			int currCoor[2];
@@ -99,10 +136,10 @@ void ATerrainGenerator::OnConstruction(const FTransform& Transform)
 			vertices[nextCoord].Z = -500;
 			//UE_LOG(LogTemp, Log, TEXT("This coord has been modified: %d"), nextCoord);
 			expansion[randDir] = nextCoord;
-		}
+		}*/
 
-		remainingPoints -= pointsUsed;
-	}
+		//remainingPoints -= pointsUsed;
+
 
 	// Adds hilly terrain
 
