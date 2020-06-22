@@ -17,6 +17,7 @@ void ATerrainGenerator::OnConstruction(const FTransform& Transform)
 	ClearMeshData();
 
 	int radius = 20;
+	int seed = 50;
 
 	// Populates vertices.
 	for (int i = 0; i < verticeDimensionX; i++)
@@ -29,12 +30,13 @@ void ATerrainGenerator::OnConstruction(const FTransform& Transform)
 	int centerY = verticeDimensionY / 2;
 
 	for (float rad = 0; rad < 6.28318531; rad += 0.1) {
-		//float pN = FMath::PerlinNoise1D(rad);
+		float fR = radius + (FMath::PerlinNoise1D(seed + rad) * 20);
+		UE_LOG(LogTemp, Log, TEXT("Curr PER: %f"), fR);
 		//float value = FMath::PerlinNoise2D(FVector2D(i * 0.01f, j * 0.01f));
 
 		//float finalZ = value >= 0 ? 500 : -500;
-		int x = radius * FMath::Sin(rad);
-		int y = radius * FMath::Cos(rad);
+		int x = fR * FMath::Sin(rad);
+		int y = fR * FMath::Cos(rad);
 		int coordinates[2];
 
 		coordinates[0] = centerX + x;
