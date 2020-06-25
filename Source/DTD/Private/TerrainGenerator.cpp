@@ -17,21 +17,59 @@ void ATerrainGenerator::OnConstruction(const FTransform& Transform)
 	ClearMeshData();
 
 	int radius = 20;
-	int seed = 50;
-
-	// Populates vertices.
-	for (int i = 0; i < verticeDimensionX; i++)
-		for (int j = 0; j < verticeDimensionY; j++) 
-			// Perlin noise to give terrain a more rocky feel
-			vertices.Add(FVector(plotSpace * i, plotSpace * j, 0));
-		
+	int seed = 500;
 
 	int centerX = verticeDimensionX / 2;
 	int centerY = verticeDimensionY / 2;
 
-	for (float rad = 0; rad < 6.28318531; rad += 0.1) {
+	UE_LOG(LogTemp, Log, TEXT("Curr Seed: %d"), seed);
+
+	//int totalcount = 0;
+
+	// Populates vertices.
+	for (int i = 0; i < verticeDimensionX; i++)
+		for (int j = 0; j < verticeDimensionY; j++) {
+			// Perlin noise to give terrain a more rocky feel
+			vertices.Add(FVector(plotSpace * i, plotSpace * j, 0));
+
+			//int coordinatesX = centerX + i;
+			//int coordinatesY = centerY + j;
+
+			//float dot = (coordinatesX * coordinatesY) + (centerX * (centerY + radius));
+			//float det = (coordinatesX * coordinatesY) - (centerX * (centerY + radius));
+			//FVector posFromCentre = FVector(i - centerX, j - centerY,0);
+			//float angle = posFromCentre.HeadingAngle();
+			int reposX = i - centerX;
+			int reposY = j - centerY;
+
+			float dP = (reposX * 0) + (reposY * radius);
+			float cP = (reposY * 0) - (reposX * radius);
+
+			//float angle = atan2(centerY + radius, centerX) - atan2(j, i);
+
+			//if (angle < 0)
+				//angle += PI * 2;
+
+			//float angle = FMath::RadiansToDegrees(FMath::Atan2(FMath::Abs(cP), dP));//FMath::RadiansToDegrees(FMath::Acos(FVector::DotProduct(dp1, dp2)));
+
+			float angle = FMath::RadiansToDegrees(FMath::Atan2(radius, 0) - FMath::Atan2(reposY, reposX));
+
+			//if (angle < 0)
+				//totalcount++;
+
+			UE_LOG(LogTemp, Log, TEXT("Angle0: %f, Given Coord set: %d, %d"), angle, reposX, reposY);
+			//FMath::P
+		}
+
+	//UE_LOG(LogTemp, Log, TEXT("TC: %d"), totalcount);
+
+
+
+	/*for (float rad = 0; rad < 6.28318531; rad += 0.1) {
 		float fR = radius + (FMath::PerlinNoise1D(seed + rad) * 20);
-		UE_LOG(LogTemp, Log, TEXT("Curr PER: %f"), fR);
+
+
+
 		//float value = FMath::PerlinNoise2D(FVector2D(i * 0.01f, j * 0.01f));
 
 		//float finalZ = value >= 0 ? 500 : -500;
@@ -41,8 +79,16 @@ void ATerrainGenerator::OnConstruction(const FTransform& Transform)
 
 		coordinates[0] = centerX + x;
 		coordinates[1] = centerY + y;
+
+		FVector dp1 = FVector(coordinates[0], coordinates[1], 0);
+		FVector dp2 = FVector(centerX, (centerY + radius), 0);
+
+		//float dot = (coordinates[0] *  coordinates[1]) + (centerX * (centerY + radius));
+		//float det = (coordinates[0] * coordinates[1]) - (centerX * (centerY + radius));
+		float angle = FMath::RadiansToDegrees(FMath::Acos(FVector::DotProduct(dp1,dp2)));
+
 		vertices[GetIndex(coordinates)].Z = -500;
-	}
+	}*/
 
 
 	// Adds chasms

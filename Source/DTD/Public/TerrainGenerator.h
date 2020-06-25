@@ -7,6 +7,7 @@
 #include "ProceduralMeshComponent.h"
 #include "RoomProceduralGenerator.h"
 #include "Math/UnrealMathUtility.h"
+#include "Math/UnrealMathVectorConstants.h"
 #include "TerrainGenerator.generated.h"
 
 UCLASS()
