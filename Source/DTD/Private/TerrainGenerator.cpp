@@ -16,8 +16,9 @@ void ATerrainGenerator::OnConstruction(const FTransform& Transform)
 {
 	ClearMeshData();
 
-	int radius = 20;
-	int seed = 500;
+	int radius = 30;
+	int seed = 20000;
+	float noiseMultiplier = 20;
 
 	int centerX = verticeDimensionX / 2;
 	int centerY = verticeDimensionY / 2;
@@ -29,8 +30,18 @@ void ATerrainGenerator::OnConstruction(const FTransform& Transform)
 	// Populates vertices.
 	for (int i = 0; i < verticeDimensionX; i++)
 		for (int j = 0; j < verticeDimensionY; j++) {
+			int reposX = i - centerX;
+			int reposY = j - centerY;
+
+			float rad = FMath::Atan2(radius, 0) - FMath::Atan2(reposY, reposX);
+			float radiusLimit = radius + (FMath::PerlinNoise1D(seed + rad) * noiseMultiplier);
+
+			FVector vectorDiff = FVector(centerX, centerY, 0) - FVector(i, j, 0);
+
+			float pointZ = vectorDiff.SizeSquared() <= (radiusLimit * radiusLimit) ? 200 : -400;
+
 			// Perlin noise to give terrain a more rocky feel
-			vertices.Add(FVector(plotSpace * i, plotSpace * j, 0));
+			vertices.Add(FVector(plotSpace * i, plotSpace * j, pointZ));
 
 			//int coordinatesX = centerX + i;
 			//int coordinatesY = centerY + j;
@@ -39,11 +50,9 @@ void ATerrainGenerator::OnConstruction(const FTransform& Transform)
 			//float det = (coordinatesX * coordinatesY) - (centerX * (centerY + radius));
 			//FVector posFromCentre = FVector(i - centerX, j - centerY,0);
 			//float angle = posFromCentre.HeadingAngle();
-			int reposX = i - centerX;
-			int reposY = j - centerY;
 
-			float dP = (reposX * 0) + (reposY * radius);
-			float cP = (reposY * 0) - (reposX * radius);
+			//float dP = (reposX * 0) + (reposY * radius);
+			//float cP = (reposY * 0) - (reposX * radius);
 
 			//float angle = atan2(centerY + radius, centerX) - atan2(j, i);
 
@@ -52,12 +61,11 @@ void ATerrainGenerator::OnConstruction(const FTransform& Transform)
 
 			//float angle = FMath::RadiansToDegrees(FMath::Atan2(FMath::Abs(cP), dP));//FMath::RadiansToDegrees(FMath::Acos(FVector::DotProduct(dp1, dp2)));
 
-			float angle = FMath::RadiansToDegrees(FMath::Atan2(radius, 0) - FMath::Atan2(reposY, reposX));
 
 			//if (angle < 0)
 				//totalcount++;
 
-			UE_LOG(LogTemp, Log, TEXT("Angle0: %f, Given Coord set: %d, %d"), angle, reposX, reposY);
+			//UE_LOG(LogTemp, Log, TEXT("Angle0: %f, Given Coord set: %d, %d"), angle, reposX, reposY);
 			//FMath::P
 		}
 
