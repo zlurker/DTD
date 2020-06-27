@@ -45,6 +45,10 @@ public:
 		float plotSpace = 100;
 
 	virtual void OnConstruction(const FTransform& Transform) override;
+
+	void GeneratePerlinShapeIsland();
+	void GeneratePushedElevationIsland();
+	float ElevationClamp(FVector vectorFromCenter, float elevation);
 	void GetCoordinatePosition(int index, int* coordinates);
 	int GetIndex(int* coordinates);
 

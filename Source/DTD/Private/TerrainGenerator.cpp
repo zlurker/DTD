@@ -12,18 +12,15 @@ ATerrainGenerator::ATerrainGenerator()
 
 }
 
-void ATerrainGenerator::OnConstruction(const FTransform& Transform)
-{
-	ClearMeshData();
-
-	int radius = 30;
-	int seed = 20000;
+void ATerrainGenerator::GeneratePerlinShapeIsland() {
+	int radius = 40;
+	int seed = 10;
 	float noiseMultiplier = 20;
 
 	int centerX = verticeDimensionX / 2;
 	int centerY = verticeDimensionY / 2;
 
-	UE_LOG(LogTemp, Log, TEXT("Curr Seed: %d"), seed);
+	UE_LOG(LogTemp, Log, TEXT("Curr Seed 0: %d"), seed);
 
 	//int totalcount = 0;
 
@@ -38,7 +35,23 @@ void ATerrainGenerator::OnConstruction(const FTransform& Transform)
 
 			FVector vectorDiff = FVector(centerX, centerY, 0) - FVector(i, j, 0);
 
-			float pointZ = vectorDiff.SizeSquared() <= (radiusLimit * radiusLimit) ? 200 : -400;
+			float pointZ = -500;
+
+			if (vectorDiff.SizeSquared() <= (radiusLimit * radiusLimit)) {
+				float freqMultiplier = 1;
+				int internalFreq = 1;
+				int freq = 5;
+
+				for (int k = 0; k < freq; k++) {
+					pointZ = FMath::PerlinNoise2D(FVector2D(seed + i, seed + j) * 0.075f * internalFreq) * freqMultiplier * 1000;
+					freqMultiplier /= 2;
+					internalFreq *= 2;
+				}
+
+				UE_LOG(LogTemp, Log, TEXT("Curr Z: %f"), pointZ);
+			}
+
+
 
 			// Perlin noise to give terrain a more rocky feel
 			vertices.Add(FVector(plotSpace * i, plotSpace * j, pointZ));
@@ -68,6 +81,45 @@ void ATerrainGenerator::OnConstruction(const FTransform& Transform)
 			//UE_LOG(LogTemp, Log, TEXT("Angle0: %f, Given Coord set: %d, %d"), angle, reposX, reposY);
 			//FMath::P
 		}
+}
+
+void ATerrainGenerator::GeneratePushedElevationIsland() {
+	int centralX = verticeDimensionX / 2;
+	int centralY = verticeDimensionY / 2;
+	int seed = 1000;
+
+	UE_LOG(LogTemp, Log, TEXT("Formula Test: %d, Seed: %d"), 11, seed);
+	for (int i = 0; i < verticeDimensionX; i++) {
+		int xFromCentral = FMath::Abs(centralX - i);
+
+		for (int j = 0; j < verticeDimensionY; j++) {
+			int yFromCentral = FMath::Abs(centralY - j);
+			float elevation = ElevationClamp(FVector(xFromCentral, yFromCentral, 0), FMath::PerlinNoise2D(FVector2D(seed + i, seed + j) * 0.1f));
+
+			vertices.Add(FVector(plotSpace * i, plotSpace * j, elevation * 1000));
+		}
+	}
+}
+
+float ATerrainGenerator::ElevationClamp(FVector vectorFromCenter, float elevation) {
+
+	float totalElevation = elevation + (2 - ((vectorFromCenter.SizeSquared() / (FVector(verticeDimensionX, verticeDimensionY, 0).SizeSquared())) * 30));//(((vectorFromCenter.SizeSquared() / (FVector(verticeDimensionX, verticeDimensionY, 0).SizeSquared()/2)) * 2) - 1);
+
+	if (totalElevation < -1)
+		totalElevation = -1;
+	else if (totalElevation > 1)
+		totalElevation = 1;
+
+	UE_LOG(LogTemp, Log, TEXT("%f ini elevation,%f fin elevation"), elevation, totalElevation);
+
+	return totalElevation;
+}
+
+void ATerrainGenerator::OnConstruction(const FTransform& Transform)
+{
+	ClearMeshData();
+	GeneratePushedElevationIsland();
+
 
 	//UE_LOG(LogTemp, Log, TEXT("TC: %d"), totalcount);
 
