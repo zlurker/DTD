@@ -52,5 +52,7 @@ public:
 	void GetCoordinatePosition(int index, int* coordinates);
 	int GetIndex(int* coordinates);
 
+	void PaintSMVertices(UStaticMeshComponent* inst);
+
 	void ClearMeshData();
 };

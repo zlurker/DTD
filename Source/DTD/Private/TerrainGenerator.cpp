@@ -86,9 +86,9 @@ void ATerrainGenerator::GeneratePerlinShapeIsland() {
 void ATerrainGenerator::GeneratePushedElevationIsland() {
 	int centralX = verticeDimensionX / 2;
 	int centralY = verticeDimensionY / 2;
-	int seed = 1000;
+	int seed = 20193;
 
-	UE_LOG(LogTemp, Log, TEXT("Formula Test: %d, Seed: %d"), 11, seed);
+	UE_LOG(LogTemp, Log, TEXT("Formula Test: %d, Seed: %d"), 15, seed);
 	for (int i = 0; i < verticeDimensionX; i++) {
 		int xFromCentral = FMath::Abs(centralX - i);
 
@@ -96,21 +96,21 @@ void ATerrainGenerator::GeneratePushedElevationIsland() {
 			int yFromCentral = FMath::Abs(centralY - j);
 			float elevation = ElevationClamp(FVector(xFromCentral, yFromCentral, 0), FMath::PerlinNoise2D(FVector2D(seed + i, seed + j) * 0.1f));
 
-			vertices.Add(FVector(plotSpace * i, plotSpace * j, elevation * 1000));
+			vertices.Add(FVector(plotSpace * i, plotSpace * j, elevation * 500));
 		}
 	}
 }
 
 float ATerrainGenerator::ElevationClamp(FVector vectorFromCenter, float elevation) {
 
-	float totalElevation = elevation + (2 - ((vectorFromCenter.SizeSquared() / (FVector(verticeDimensionX, verticeDimensionY, 0).SizeSquared())) * 30));//(((vectorFromCenter.SizeSquared() / (FVector(verticeDimensionX, verticeDimensionY, 0).SizeSquared()/2)) * 2) - 1);
+	float totalElevation = elevation + (0.5f - ((vectorFromCenter.SizeSquared() / (FVector(verticeDimensionX, verticeDimensionY, 0).SizeSquared())) * 10));//(((vectorFromCenter.SizeSquared() / (FVector(verticeDimensionX, verticeDimensionY, 0).SizeSquared()/2)) * 2) - 1);
 
 	if (totalElevation < -1)
 		totalElevation = -1;
 	else if (totalElevation > 1)
 		totalElevation = 1;
 
-	UE_LOG(LogTemp, Log, TEXT("%f ini elevation,%f fin elevation"), elevation, totalElevation);
+	//UE_LOG(LogTemp, Log, TEXT("%f ini elevation,%f fin elevation"), elevation, totalElevation);
 
 	return totalElevation;
 }
@@ -269,6 +269,16 @@ void ATerrainGenerator::OnConstruction(const FTransform& Transform)
 			triangles.Add(index3);
 			triangles.Add(index2);
 			triangles.Add(index1);
+
+			/*int vertexCoords[2];
+
+			vertexCoords[0] = i;
+			vertexCoords[1] = j;
+
+			if (vertices[GetIndex(vertexCoords)].Z >= 0)
+				vertexColors.Add(FColor(255, 0, 0, 1));
+			else
+				vertexColors.Add(FColor(255, 0, 0, 1));*/
 		}
 
 	/*vertices.Add(FVector(0.0f, 0.0f, 0.0f));
