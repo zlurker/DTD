@@ -19,7 +19,7 @@ public:
 	// Sets default values for this actor's properties
 	ATerrainGenerator();
 
-	UPROPERTY(VisibleAnywhere, Category = "MyProceduralMesh")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "MyProceduralMesh")
 		UProceduralMeshComponent* pm;
 
 	UPROPERTY()
@@ -51,8 +51,5 @@ public:
 	float ElevationClamp(FVector vectorFromCenter, float elevation);
 	void GetCoordinatePosition(int index, int* coordinates);
 	int GetIndex(int* coordinates);
-
-	void PaintSMVertices(UStaticMeshComponent* inst);
-
 	void ClearMeshData();
 };

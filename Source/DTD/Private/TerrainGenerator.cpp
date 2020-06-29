@@ -88,7 +88,7 @@ void ATerrainGenerator::GeneratePushedElevationIsland() {
 	int centralY = verticeDimensionY / 2;
 	int seed = 20193;
 
-	UE_LOG(LogTemp, Log, TEXT("Formula Test: %d, Seed: %d"), 15, seed);
+	UE_LOG(LogTemp, Log, TEXT("Formula Test: %d, Seed: %d"), 16, seed);
 	for (int i = 0; i < verticeDimensionX; i++) {
 		int xFromCentral = FMath::Abs(centralX - i);
 
@@ -118,7 +118,20 @@ float ATerrainGenerator::ElevationClamp(FVector vectorFromCenter, float elevatio
 void ATerrainGenerator::OnConstruction(const FTransform& Transform)
 {
 	ClearMeshData();
-	GeneratePushedElevationIsland();
+	UE_LOG(LogTemp, Log, TEXT("Version: %d"), 6);
+	//GeneratePushedElevationIsland();
+
+	for (int i = 0; i < verticeDimensionX; i++)
+		for (int j = 0; j < verticeDimensionY; j++) {
+			vertices.Add(FVector(plotSpace * i, plotSpace * j, 0));
+
+			float x = (float)i / (float)verticeDimensionX;
+			float y = (float)j / (float)verticeDimensionY;
+
+			uvs.Add(FVector2D(x, y));
+			UE_LOG(LogTemp, Log, TEXT("X: %f, Y: %f"), x, y);
+		}
+
 
 
 	//UE_LOG(LogTemp, Log, TEXT("TC: %d"), totalcount);
@@ -269,6 +282,7 @@ void ATerrainGenerator::OnConstruction(const FTransform& Transform)
 			triangles.Add(index3);
 			triangles.Add(index2);
 			triangles.Add(index1);
+			//vertexColors.Add(FLinearColor(255.0f, 0.f, 0.f));
 
 			/*int vertexCoords[2];
 
@@ -293,27 +307,34 @@ void ATerrainGenerator::OnConstruction(const FTransform& Transform)
 	triangles.Add(3);
 	triangles.Add(2);
 	triangles.Add(1);*/
+	//uvs.Init(FVector2D(0.0f, 0.0f), verticeDimensionX * verticeDimensionY);
 
-	normals.Init(FVector(1, 0.0f, 0.0f), 4);
+	//uvs.Add(FVector2D(0.0f, 0.0f));
+	//uvs.Add(FVector2D(1.0f, 0.0f));
+	//uvs.Add(FVector2D(0.0f, 1.0f));
+	//uvs.Add(FVector2D(1.0f, 1.0f));
+	//uvs.Init(FVector2D(0.0f, 0.0f), 3);	
 
-	uvs.Add(FVector2D(0.0f, 0.0f));
-	uvs.Add(FVector2D(1.0f, 0.0f));
-	uvs.Add(FVector2D(0.0f, 1.0f));
-	uvs.Add(FVector2D(1.0f, 1.0f));
+	/*vertexColors.Add(FLinearColor(0.f, 0.f, 1.f));
+	vertexColors.Add(FLinearColor(1.f, 0.f, 0.f));
+	vertexColors.Add(FLinearColor(1.f, 0.f, 0.f));
+	vertexColors.Add(FLinearColor(0.f, 1.f, 0.f));
+	vertexColors.Add(FLinearColor(0.f, 1.f, 0.f));
+	vertexColors.Add(FLinearColor(1.f, 1.f, 0.f));
+	vertexColors.Add(FLinearColor(0.f, 1.f, 1.f));*/
 
-	//uvs.Init(FVector2D(0.0f, 0.0f), 3);
+	//vertexColors.Add(FLinearColor(1, 0, 0, 1.0));
+	//vertexColors.Add(FLinearColor(0, 1, 0, 1.0));                              // the 4th argument determines alpha value (0,1)
+	//vertexColors.Add(FLinearColor(1, 1, 0, 1.0));
 
-	//vertexColors.Init(FLinearColor(0.75f, 0.0f, 0.0f, 1.0f), 4);
+	//vertexColors.Init(FLinearColor(255, 0, 0), verticeDimensionX * verticeDimensionY);
 
-	vertexColors.Add(FLinearColor(1, 0, 0, 1.0));
-	vertexColors.Add(FLinearColor(1, 0, 0, 1.0));
-	vertexColors.Add(FLinearColor(0, 1, 0, 1.0));                              // the 4th argument determines alpha value (0,1)
-	vertexColors.Add(FLinearColor(1, 1, 0, 1.0));
-
-	tangents.Init(FProcMeshTangent(0.0f, 1.0f, 0.0f), 4);
+	normals.Init(FVector(0.0f, 0.0f, 1.0f), verticeDimensionX * verticeDimensionY);
+	vertexColors.Init(FLinearColor(0.0f, 0.0f, 0.0f, 1.0f), verticeDimensionX * verticeDimensionY);
+	tangents.Init(FProcMeshTangent(1.0f, 0.0f, 0.0f), verticeDimensionX * verticeDimensionY);
 
 	//Function that creates mesh section
-	pm->CreateMeshSection_LinearColor(1, vertices, triangles, normals, uvs, vertexColors, tangents, false);
+	pm->CreateMeshSection_LinearColor(0, vertices, triangles, normals, uvs, vertexColors, tangents, false);
 }
 
 void ATerrainGenerator::GetCoordinatePosition(int index, int* coordinates) {
