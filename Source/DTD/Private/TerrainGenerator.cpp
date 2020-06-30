@@ -9,7 +9,6 @@ ATerrainGenerator::ATerrainGenerator()
 
 	pm = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("ProceduralMesh"));
 	pm->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
-
 }
 
 void ATerrainGenerator::GeneratePerlinShapeIsland() {
@@ -87,9 +86,9 @@ void ATerrainGenerator::GeneratePushedElevationIsland() {
 	int centralX = verticeDimensionX / 2;
 	int centralY = verticeDimensionY / 2;
 	int seed = 20193;
-	currentBiomes = 0;
+	//currentBiomes = 0;
 
-	UE_LOG(LogTemp, Log, TEXT("Formula Test: %d, Seed: %d"), 27, seed);
+	UE_LOG(LogTemp, Log, TEXT("Formula Test: %d, Seed: %d"), 36, seed);
 	for (int i = 0; i < verticeDimensionX; i++) {
 		int xFromCentral = FMath::Abs(centralX - i);
 
@@ -100,25 +99,36 @@ void ATerrainGenerator::GeneratePushedElevationIsland() {
 			vertices.Add(FVector(plotSpace * i, plotSpace * j, elevation * 500));
 			int currVertice = vertices.Num() - 1;
 			/*
-			Checks neighbouring vertices that has been spawned.
-			Where X is before, O is after and T is target.
-			XOO
-			XTO
-			XXO
+			Checks prev x-1,y-1 vertice
+			Where X is irrelevant, O is current and T is target.
+			XXX
+			XOX
+			XXT
 			*/
-			if (BiomeCheckNeighbourVertice(currVertice, FVector2D(0.f, -1.f))) continue;
-			if (BiomeCheckNeighbourVertice(currVertice, FVector2D(-1.f, -1.f))) continue;
-			if (BiomeCheckNeighbourVertice(currVertice, FVector2D(-1.f, 0.f))) continue;
-			if (BiomeCheckNeighbourVertice(currVertice, FVector2D(-1.f, 1.f))) continue;
+			FVector2D prev = FVector2D(i, j) - FVector2D(1, 1);
+
+			if (!IsCoordinateWithinBounds(prev))
+				continue;
+
+			int prevVerticeId = GetIndex(prev);
+
+			if (CheckIfVerticeIsPeak(prevVerticeId))
+				peaks.Add(prevVerticeId);
+
+			//if (BiomeCheckNeighbourVertice(currVertice, FVector2D(0.f, -1.f))) continue;
+			//if (BiomeCheckNeighbourVertice(currVertice, FVector2D(-1.f, -1.f))) continue;
+			//if (BiomeCheckNeighbourVertice(currVertice, FVector2D(-1.f, 0.f))) continue;
+			//if (BiomeCheckNeighbourVertice(currVertice, FVector2D(-1.f, 1.f))) continue;
 
 			// If none of the above direction gives us anything, it means we need to start a new biome data.
 			//biomesData.Add(&BiomeDataCreator());
 			//int assignedBiome = biomesData.Num() - 1;
-			verticeAssignedBiome.Add(currentBiomes);
+
 			//biomesData[assignedBiome]->AddBiomeVertice(currVertice, vertices[currVertice].Z);
 
-			UE_LOG(LogTemp, Log, TEXT("Vertice %d has created a new biome %d"), currVertice, currentBiomes);
-			currentBiomes++;
+			//UE_LOG(LogTemp, Log, TEXT("Vertice %d has created a new biome %d"), currVertice, currentBiomes);
+			//verticeAssignedBiome.Add(currentBiomes);
+			//currentBiomes++;
 		}
 	}
 }
@@ -144,9 +154,31 @@ float ATerrainGenerator::ElevationClamp(FVector vectorFromCenter, float elevatio
 void ATerrainGenerator::OnConstruction(const FTransform& Transform)
 {
 	ClearMeshData();
+
+	if (directions.Num() == 0) {
+		directions.Add(FVector2D(0, 1));
+		directions.Add(FVector2D(1, 1));
+		directions.Add(FVector2D(1, 0));
+		directions.Add(FVector2D(1, -1));
+		directions.Add(FVector2D(0, -1));
+		directions.Add(FVector2D(-1, -1));
+		directions.Add(FVector2D(-1, 0));
+		directions.Add(FVector2D(-1, 1));
+	}
+
+	peaks.Empty();
+
 	GeneratePushedElevationIsland();
 
-	for (int i = 0; i < verticeDimensionX; i++) {
+	uvs.Init(FVector2D(-1, -1), verticeDimensionX * verticeDimensionY);
+
+	for (int i = 0; i < peaks.Num(); i++) {
+
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("Peak count: %d/%d"), peaks.Num(), verticeDimensionX * verticeDimensionY);
+
+	/*for (int i = 0; i < verticeDimensionX; i++) {
 		int uvX = i % 2;
 		for (int j = 0; j < verticeDimensionY; j++) {
 			//vertices.Add(FVector(plotSpace * i, plotSpace * j, 0));
@@ -155,13 +187,13 @@ void ATerrainGenerator::OnConstruction(const FTransform& Transform)
 			//float y = ((float)j / (float)verticeDimensionY);
 			FVector2D coords = FVector2D(i, j);
 
-			float baseFloat = (float)(verticeAssignedBiome[GetIndex(FVector2D(i, j))] % 5) / 5.f;
-			UE_LOG(LogTemp, Log, TEXT("BF: %f"), baseFloat);
-			FVector2D base = FVector2D(baseFloat, 0);
-			uvs.Add(base + (FVector2D(uvX *0.2f, uvY)));
+			//float baseFloat = (float)(verticeAssignedBiome[GetIndex(FVector2D(i, j))] % 5) / 5.f;
+			//UE_LOG(LogTemp, Log, TEXT("BF: %f"), baseFloat);
+			//FVector2D base = FVector2D(baseFloat, 0);
+			//uvs.Add(base + (FVector2D(uvX *0.2f, uvY)));
 			//UE_LOG(LogTemp, Log, TEXT("X: %d, Y: %d"), uvX, uvY);
 		}
-	}
+	}*/
 
 
 
@@ -368,33 +400,60 @@ void ATerrainGenerator::OnConstruction(const FTransform& Transform)
 	pm->CreateMeshSection_LinearColor(0, vertices, triangles, normals, uvs, vertexColors, tangents, false);
 }
 
-bool ATerrainGenerator::BiomeCheckNeighbourVertice(int vertice, FVector2D direction) {
+bool ATerrainGenerator::CheckIfVerticeIsPeak(int vertice) {
 
 	//UE_LOG(LogTemp, Log, TEXT("PRE: Vertice: %d, Direction X: %f, Y: %f"), vertice, direction.X, direction.Y);
 
 	FVector2D coordinates;
+
+	//FVector2D preTargetCoordinates;
+
 	GetCoordinatePosition(vertice, &coordinates);
 
-	coordinates += direction;
 
-	if (coordinates.X < 0 || coordinates.Y < 0 || coordinates.X >= verticeDimensionX || coordinates.Y >= verticeDimensionY)
+
+	for (int i = 0; i < directions.Num(); i++) {
+
+		//UE_LOG(LogTemp, Log, TEXT("Original Coords: X: %f, Y: %f"), coordinates.X, coordinates.Y);
+		//UE_LOG(LogTemp, Log, TEXT("Dir Coords: X: %f, Y: %f"), directions[i].X, directions[i].Y);
+		FVector2D combinedCoordinates = coordinates + directions[i];
+		//UE_LOG(LogTemp, Log, TEXT("Combined Coords: X: %f, Y: %f"), combinedCoordinates.X, combinedCoordinates.Y);
+
+		if (!IsCoordinateWithinBounds(combinedCoordinates))
+			continue;
+
+		//UE_LOG(LogTemp, Log, TEXT("Peak test: %d: %f, %d: %f"), GetIndex(combinedCoordinates), vertices[GetIndex(combinedCoordinates)].Z, vertice, vertices[vertice].Z);
+		if (vertices[GetIndex(combinedCoordinates)].Z >= vertices[vertice].Z)
+			return false;
+	}
+
+
+
+	/*coordinates += direction;
+	preTargetCoordinates = coordinates + direction;
+
+	if (!IsCoordinateWithinBounds(coordinates) || !IsCoordinateWithinBounds(preTargetCoordinates))
 		return false;
 
 	int targetVert = GetIndex(coordinates);
+	int preTargetVert = GetIndex(preTargetCoordinates);
 
 	// We can insert a different perlin layer into this after the prototype works.
-	int vertSign = vertices[vertice].Z / FMath::Abs(vertices[vertice].Z);
-	int tVertSign = vertices[targetVert].Z / FMath::Abs(vertices[targetVert].Z);
+	float cVH = vertices[vertice].Z;
+	float tVH = vertices[targetVert].Z;
+	float ptVH = vertices[preTargetVert].Z;
 
-	if (vertSign != tVertSign)
+	if (cVH > tVH && ptVH >= tVH)
 		return false;
 
 	int targetVertBiome = verticeAssignedBiome[targetVert];
 	//biomesData[targetVertBiome]->AddBiomeVertice(vertice, vertices[vertice].Z);
 	verticeAssignedBiome.Add(targetVertBiome);
-	//UE_LOG(LogTemp, Log, TEXT("Vertice: %d, Direction X: %f, Y: %f, Index returned: %d, Assigned Biome: %d"), vertice, direction.X, direction.Y, targetVert, targetVertBiome);
+	//UE_LOG(LogTemp, Log, TEXT("Vertice: %d, Direction X: %f, Y: %f, Index returned: %d, Assigned Biome: %d"), vertice, direction.X, direction.Y, targetVert, targetVertBiome);*/
 	return true;
 }
+
+
 
 void ATerrainGenerator::GetCoordinatePosition(int index, FVector2D* coordinates) {
 	coordinates->Y = index % verticeDimensionX;
@@ -403,6 +462,13 @@ void ATerrainGenerator::GetCoordinatePosition(int index, FVector2D* coordinates)
 
 int ATerrainGenerator::GetIndex(FVector2D coordinates) {
 	return (coordinates.X * verticeDimensionX) + coordinates.Y;
+}
+
+bool ATerrainGenerator::IsCoordinateWithinBounds(FVector2D coordinate) {
+	if (coordinate.X < 0 || coordinate.Y < 0 || coordinate.X >= verticeDimensionX || coordinate.Y >= verticeDimensionY)
+		return false;
+
+	return true;
 }
 
 

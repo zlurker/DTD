@@ -53,12 +53,18 @@ public:
 	void GetCoordinatePosition(int index, FVector2D* coordinates);
 	int GetIndex(FVector2D coordinates);
 	void ClearMeshData();
-	bool BiomeCheckNeighbourVertice(int vertice, FVector2D direction);
+	bool CheckIfVerticeIsPeak(int vertice);
 	BiomesData BiomeDataCreator();
 
 private:
-	int currentBiomes;
-	TArray<BiomesData*> biomesData;
+	bool IsCoordinateWithinBounds(FVector2D coordinate);
 
-	TArray<int> verticeAssignedBiome;
+private:
+	TArray<int> peaks;
+	TArray<FVector2D> directions;
+	//FVector2D directions[];
+	//int currentBiomes;
+	//TArray<BiomesData*> biomesData;
+
+	//TArray<int> verticeAssignedBiome;
 };
