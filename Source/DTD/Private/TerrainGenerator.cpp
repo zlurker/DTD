@@ -88,7 +88,7 @@ void ATerrainGenerator::GeneratePushedElevationIsland() {
 	int centralY = verticeDimensionY / 2;
 	int seed = 20193;
 
-	UE_LOG(LogTemp, Log, TEXT("Formula Test: %d, Seed: %d"), 16, seed);
+	UE_LOG(LogTemp, Log, TEXT("Formula Test: %d, Seed: %d"), 19, seed);
 	for (int i = 0; i < verticeDimensionX; i++) {
 		int xFromCentral = FMath::Abs(centralX - i);
 
@@ -118,19 +118,24 @@ float ATerrainGenerator::ElevationClamp(FVector vectorFromCenter, float elevatio
 void ATerrainGenerator::OnConstruction(const FTransform& Transform)
 {
 	ClearMeshData();
-	UE_LOG(LogTemp, Log, TEXT("Version: %d"), 6);
-	//GeneratePushedElevationIsland();
+	GeneratePushedElevationIsland();
 
-	for (int i = 0; i < verticeDimensionX; i++)
+	for (int i = 0; i < verticeDimensionX; i++) {
+		int uvX = i % 2;
 		for (int j = 0; j < verticeDimensionY; j++) {
-			vertices.Add(FVector(plotSpace * i, plotSpace * j, 0));
+			//vertices.Add(FVector(plotSpace * i, plotSpace * j, 0));
+			int uvY = j % 2;
+			//float x = ((float)i / (float)verticeDimensionX);
+			//float y = ((float)j / (float)verticeDimensionY);
+			int coords[2];
+			coords[0] = i;
+			coords[1] = j;
 
-			float x = (float)i / (float)verticeDimensionX;
-			float y = (float)j / (float)verticeDimensionY;
-
-			uvs.Add(FVector2D(x, y));
-			UE_LOG(LogTemp, Log, TEXT("X: %f, Y: %f"), x, y);
+			FVector2D base = vertices[GetIndex(coords)].Z < 0.5 ? FVector2D(0, 0) : FVector2D(0.5f, 0.5f);
+			uvs.Add(base + (FVector2D(uvX, uvY) * 0.5f));
+			//UE_LOG(LogTemp, Log, TEXT("X: %d, Y: %d"), uvX, uvY);
 		}
+	}
 
 
 
