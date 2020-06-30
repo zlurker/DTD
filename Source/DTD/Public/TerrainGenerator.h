@@ -62,6 +62,8 @@ private:
 private:
 	TArray<int> peaks;
 	TArray<FVector2D> directions;
+	TArray<FVector2D> squareBase;
+	TArray<FVector2D> squareDir;
 	//FVector2D directions[];
 	//int currentBiomes;
 	//TArray<BiomesData*> biomesData;

@@ -88,7 +88,7 @@ void ATerrainGenerator::GeneratePushedElevationIsland() {
 	int seed = 20193;
 	//currentBiomes = 0;
 
-	UE_LOG(LogTemp, Log, TEXT("Formula Test: %d, Seed: %d"), 36, seed);
+	UE_LOG(LogTemp, Log, TEXT("Formula Test: %d, Seed: %d"), 40, seed);
 	for (int i = 0; i < verticeDimensionX; i++) {
 		int xFromCentral = FMath::Abs(centralX - i);
 
@@ -166,14 +166,64 @@ void ATerrainGenerator::OnConstruction(const FTransform& Transform)
 		directions.Add(FVector2D(-1, 1));
 	}
 
+	if (squareBase.Num() == 0) {
+		squareBase.Add(FVector2D(-1, 1));
+		squareBase.Add(FVector2D(1, 1));
+		squareBase.Add(FVector2D(1, -1));
+		squareBase.Add(FVector2D(-1, -1));
+	}
+
+	if (squareDir.Num() == 0) {
+		squareDir.Add(FVector2D(1, 0));
+		squareDir.Add(FVector2D(0, -1));
+		squareDir.Add(FVector2D(-1, 0));
+		squareDir.Add(FVector2D(0, 1));
+	}
+
 	peaks.Empty();
 
 	GeneratePushedElevationIsland();
 
 	uvs.Init(FVector2D(-1, -1), verticeDimensionX * verticeDimensionY);
+	int currExpansion = 0;
 
-	for (int i = 0; i < peaks.Num(); i++) {
+	while (peaks.Num() > 0) {
 
+		for (int i = peaks.Num() - 1; i >= 0; i--) {
+			int lenOfSquare = 1 + (currExpansion * 2);
+			int totalFilled = 0;
+			FVector2D peakLocation;
+
+			GetCoordinatePosition(peaks[i], &peakLocation);
+
+			for (int j = 0; j < 4; j++) {
+				FVector2D baseOffset = (squareBase[j] * currExpansion);
+
+				for (int k = 0; k < lenOfSquare; k++) {
+					FVector2D currPos = peakLocation + baseOffset + (squareDir[j] * k);
+
+					if (!IsCoordinateWithinBounds(currPos))
+						continue;
+
+					int vertexIndex = GetIndex(currPos);
+					int uvX = (int)currPos.X % 2;
+					int uvY = (int)currPos.Y % 2;
+
+					if (uvs[vertexIndex].X == -1) {
+						float baseFloat = (float)(i % 5) / 5.f;
+						//UE_LOG(LogTemp, Log, TEXT("BF: %f"), baseFloat);
+						FVector2D base = FVector2D(baseFloat, 0);
+						uvs[vertexIndex] = (base + (FVector2D(uvX *0.2f, uvY)));
+						totalFilled++;
+					}
+				}
+			}
+
+			if (totalFilled == 0)
+				peaks.RemoveAt(i);
+		}
+
+		currExpansion++;
 	}
 
 	UE_LOG(LogTemp, Log, TEXT("Peak count: %d/%d"), peaks.Num(), verticeDimensionX * verticeDimensionY);
