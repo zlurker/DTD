@@ -8,6 +8,7 @@
 #include "RoomProceduralGenerator.h"
 #include "Math/UnrealMathUtility.h"
 #include "Math/UnrealMathVectorConstants.h"
+#include "BiomesData.h"
 #include "TerrainGenerator.generated.h"
 
 UCLASS()
@@ -44,12 +45,20 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Generation Settings")
 		float plotSpace = 100;
 
+public:
 	virtual void OnConstruction(const FTransform& Transform) override;
-
 	void GeneratePerlinShapeIsland();
 	void GeneratePushedElevationIsland();
 	float ElevationClamp(FVector vectorFromCenter, float elevation);
-	void GetCoordinatePosition(int index, int* coordinates);
-	int GetIndex(int* coordinates);
+	void GetCoordinatePosition(int index, FVector2D* coordinates);
+	int GetIndex(FVector2D coordinates);
 	void ClearMeshData();
+	bool BiomeCheckNeighbourVertice(int vertice, FVector2D direction);
+	BiomesData BiomeDataCreator();
+
+private:
+	int currentBiomes;
+	TArray<BiomesData*> biomesData;
+
+	TArray<int> verticeAssignedBiome;
 };

@@ -87,8 +87,9 @@ void ATerrainGenerator::GeneratePushedElevationIsland() {
 	int centralX = verticeDimensionX / 2;
 	int centralY = verticeDimensionY / 2;
 	int seed = 20193;
+	currentBiomes = 0;
 
-	UE_LOG(LogTemp, Log, TEXT("Formula Test: %d, Seed: %d"), 19, seed);
+	UE_LOG(LogTemp, Log, TEXT("Formula Test: %d, Seed: %d"), 27, seed);
 	for (int i = 0; i < verticeDimensionX; i++) {
 		int xFromCentral = FMath::Abs(centralX - i);
 
@@ -97,8 +98,33 @@ void ATerrainGenerator::GeneratePushedElevationIsland() {
 			float elevation = ElevationClamp(FVector(xFromCentral, yFromCentral, 0), FMath::PerlinNoise2D(FVector2D(seed + i, seed + j) * 0.1f));
 
 			vertices.Add(FVector(plotSpace * i, plotSpace * j, elevation * 500));
+			int currVertice = vertices.Num() - 1;
+			/*
+			Checks neighbouring vertices that has been spawned.
+			Where X is before, O is after and T is target.
+			XOO
+			XTO
+			XXO
+			*/
+			if (BiomeCheckNeighbourVertice(currVertice, FVector2D(0.f, -1.f))) continue;
+			if (BiomeCheckNeighbourVertice(currVertice, FVector2D(-1.f, -1.f))) continue;
+			if (BiomeCheckNeighbourVertice(currVertice, FVector2D(-1.f, 0.f))) continue;
+			if (BiomeCheckNeighbourVertice(currVertice, FVector2D(-1.f, 1.f))) continue;
+
+			// If none of the above direction gives us anything, it means we need to start a new biome data.
+			//biomesData.Add(&BiomeDataCreator());
+			//int assignedBiome = biomesData.Num() - 1;
+			verticeAssignedBiome.Add(currentBiomes);
+			//biomesData[assignedBiome]->AddBiomeVertice(currVertice, vertices[currVertice].Z);
+
+			UE_LOG(LogTemp, Log, TEXT("Vertice %d has created a new biome %d"), currVertice, currentBiomes);
+			currentBiomes++;
 		}
 	}
+}
+
+BiomesData ATerrainGenerator::BiomeDataCreator() {
+	return BiomesData();
 }
 
 float ATerrainGenerator::ElevationClamp(FVector vectorFromCenter, float elevation) {
@@ -127,12 +153,12 @@ void ATerrainGenerator::OnConstruction(const FTransform& Transform)
 			int uvY = j % 2;
 			//float x = ((float)i / (float)verticeDimensionX);
 			//float y = ((float)j / (float)verticeDimensionY);
-			int coords[2];
-			coords[0] = i;
-			coords[1] = j;
+			FVector2D coords = FVector2D(i, j);
 
-			FVector2D base = vertices[GetIndex(coords)].Z < 0.5 ? FVector2D(0, 0) : FVector2D(0.5f, 0.5f);
-			uvs.Add(base + (FVector2D(uvX, uvY) * 0.5f));
+			float baseFloat = (float)(verticeAssignedBiome[GetIndex(FVector2D(i, j))] % 5) / 5.f;
+			UE_LOG(LogTemp, Log, TEXT("BF: %f"), baseFloat);
+			FVector2D base = FVector2D(baseFloat, 0);
+			uvs.Add(base + (FVector2D(uvX *0.2f, uvY)));
 			//UE_LOG(LogTemp, Log, TEXT("X: %d, Y: %d"), uvX, uvY);
 		}
 	}
@@ -342,13 +368,41 @@ void ATerrainGenerator::OnConstruction(const FTransform& Transform)
 	pm->CreateMeshSection_LinearColor(0, vertices, triangles, normals, uvs, vertexColors, tangents, false);
 }
 
-void ATerrainGenerator::GetCoordinatePosition(int index, int* coordinates) {
-	coordinates[1] = index % verticeDimensionX;
-	coordinates[0] = (index - coordinates[1]) / verticeDimensionX;
+bool ATerrainGenerator::BiomeCheckNeighbourVertice(int vertice, FVector2D direction) {
+
+	//UE_LOG(LogTemp, Log, TEXT("PRE: Vertice: %d, Direction X: %f, Y: %f"), vertice, direction.X, direction.Y);
+
+	FVector2D coordinates;
+	GetCoordinatePosition(vertice, &coordinates);
+
+	coordinates += direction;
+
+	if (coordinates.X < 0 || coordinates.Y < 0 || coordinates.X >= verticeDimensionX || coordinates.Y >= verticeDimensionY)
+		return false;
+
+	int targetVert = GetIndex(coordinates);
+
+	// We can insert a different perlin layer into this after the prototype works.
+	int vertSign = vertices[vertice].Z / FMath::Abs(vertices[vertice].Z);
+	int tVertSign = vertices[targetVert].Z / FMath::Abs(vertices[targetVert].Z);
+
+	if (vertSign != tVertSign)
+		return false;
+
+	int targetVertBiome = verticeAssignedBiome[targetVert];
+	//biomesData[targetVertBiome]->AddBiomeVertice(vertice, vertices[vertice].Z);
+	verticeAssignedBiome.Add(targetVertBiome);
+	//UE_LOG(LogTemp, Log, TEXT("Vertice: %d, Direction X: %f, Y: %f, Index returned: %d, Assigned Biome: %d"), vertice, direction.X, direction.Y, targetVert, targetVertBiome);
+	return true;
 }
 
-int ATerrainGenerator::GetIndex(int* coordinates) {
-	return (coordinates[0] * verticeDimensionX) + coordinates[1];
+void ATerrainGenerator::GetCoordinatePosition(int index, FVector2D* coordinates) {
+	coordinates->Y = index % verticeDimensionX;
+	coordinates->X = (index - coordinates->Y) / verticeDimensionX;
+}
+
+int ATerrainGenerator::GetIndex(FVector2D coordinates) {
+	return (coordinates.X * verticeDimensionX) + coordinates.Y;
 }
 
 
