@@ -9,6 +9,8 @@
 #include "Math/UnrealMathUtility.h"
 #include "Math/UnrealMathVectorConstants.h"
 #include "BiomesData.h"
+
+#include "Kismet/GameplayStatics.h"
 #include "TerrainGenerator.generated.h"
 
 UCLASS()
@@ -47,6 +49,8 @@ public:
 
 public:
 	virtual void OnConstruction(const FTransform& Transform) override;
+	virtual void Tick(float DeltaTime) override;
+
 	void GeneratePerlinShapeIsland();
 	void GeneratePushedElevationIsland();
 	float ElevationClamp(FVector vectorFromCenter, float elevation);
@@ -54,7 +58,6 @@ public:
 	int GetIndex(FVector2D coordinates);
 	void ClearMeshData();
 	bool CheckIfVerticeIsPeak(int vertice);
-	BiomesData BiomeDataCreator();
 
 private:
 	bool IsCoordinateWithinBounds(FVector2D coordinate);
@@ -64,6 +67,9 @@ private:
 	TArray<FVector2D> directions;
 	TArray<FVector2D> squareBase;
 	TArray<FVector2D> squareDir;
+
+	int exp;
+	float timer;
 	//FVector2D directions[];
 	//int currentBiomes;
 	//TArray<BiomesData*> biomesData;

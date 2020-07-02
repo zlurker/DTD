@@ -6,7 +6,9 @@
 #include "GameFramework/GameModeBase.h"
 #include "Blueprint/UserWidget.h"
 #include "Tower.h"
+#include "Engine/World.h"
 #include "DrawDebugHelpers.h"
+#include "TerrainChunk.h"
 #include "GameplayLevel.generated.h"
 
 
@@ -18,19 +20,70 @@ class DTD_API AGameplayLevel : public AGameModeBase
 {
 	GENERATED_BODY()
 
+		/** General settings. */
 public:
-	/** Remove the current menu widget and create a new one from the specified class, if provided. */
+
 	AGameplayLevel();
 
 	UFUNCTION(BlueprintCallable, Category = "UMG Game")
 		void BuildTower(int towerType);
 	//void ChangeMenuWidget(TSubclassOf<UUserWidget> NewWidgetClass);
+	void GenerateLevel();
 	void ReduceCash();
 	void TriggerBuildTower(FVector towerLoc);
+
+public:
 	int selectedTowerType;
 
 	UPROPERTY(EditAnywhere, Category = "Economy")
 		float playerCash;
+
+	/* PG Settings/Dependencies */
+
+
+
+public:
+	UPROPERTY(EditAnywhere, Category = "Generation Settings")
+		int generationSeed;
+
+	UPROPERTY(EditAnywhere, Category = "Generation Settings")
+		int verticeDimensionX = 100;
+
+	UPROPERTY(EditAnywhere, Category = "Generation Settings")
+		int verticeDimensionY = 100;
+
+	UPROPERTY(EditAnywhere, Category = "Generation Settings")
+		float plotDistance = 100;
+
+private:
+	void GeneratePushedElevationIsland();
+	float ElevationClamp(FVector vectorFromCenter, float elevation);
+	void GetCoordinatePosition(int index, FVector2D* coordinates);
+	int GetIndex(FVector2D coordinates);
+	void ClearMeshData();
+	bool CheckIfVerticeIsPeak(int vertice);
+	bool IsCoordinateWithinBounds(FVector2D coordinate);
+
+private:
+	UPROPERTY()
+		TArray<FVector> vertices;
+	UPROPERTY()
+		TArray<FVector> normals;
+	UPROPERTY()
+		TArray<int32> triangles;
+	UPROPERTY()
+		TArray<FVector2D> uvs;
+	UPROPERTY()
+		TArray<FLinearColor> vertexColors;
+	UPROPERTY()
+		TArray<FProcMeshTangent> tangents;
+
+	TArray<int> peaks;
+	TArray<FVector2D> directions;
+	TArray<FVector2D> squareBase;
+	TArray<FVector2D> squareDir;
+
+
 
 protected:
 	/** Called when the game starts. */
