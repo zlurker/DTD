@@ -22,32 +22,24 @@ void AGameplayLevel::BeginPlay() {
 void AGameplayLevel::GenerateLevel() {
 	ATerrainChunk* terrain = GetWorld()->SpawnActor<ATerrainChunk>(ATerrainChunk::StaticClass());
 
-	if (directions.Num() == 0) {
-		directions.Add(FVector2D(0, 1));
-		directions.Add(FVector2D(1, 1));
-		directions.Add(FVector2D(1, 0));
-		directions.Add(FVector2D(1, -1));
-		directions.Add(FVector2D(0, -1));
-		directions.Add(FVector2D(-1, -1));
-		directions.Add(FVector2D(-1, 0));
-		directions.Add(FVector2D(-1, 1));
-	}
+	directions.Add(FVector2D(0, 1));
+	directions.Add(FVector2D(1, 1));
+	directions.Add(FVector2D(1, 0));
+	directions.Add(FVector2D(1, -1));
+	directions.Add(FVector2D(0, -1));
+	directions.Add(FVector2D(-1, -1));
+	directions.Add(FVector2D(-1, 0));
+	directions.Add(FVector2D(-1, 1));
 
-	if (squareBase.Num() == 0) {
-		squareBase.Add(FVector2D(-1, 1));
-		squareBase.Add(FVector2D(1, 1));
-		squareBase.Add(FVector2D(1, -1));
-		squareBase.Add(FVector2D(-1, -1));
-	}
+	squareBase.Add(FVector2D(-1, 1));
+	squareBase.Add(FVector2D(1, 1));
+	squareBase.Add(FVector2D(1, -1));
+	squareBase.Add(FVector2D(-1, -1));
 
-	if (squareDir.Num() == 0) {
-		squareDir.Add(FVector2D(1, 0));
-		squareDir.Add(FVector2D(0, -1));
-		squareDir.Add(FVector2D(-1, 0));
-		squareDir.Add(FVector2D(0, 1));
-	}
-
-	peaks.Empty();
+	squareDir.Add(FVector2D(1, 0));
+	squareDir.Add(FVector2D(0, -1));
+	squareDir.Add(FVector2D(-1, 0));
+	squareDir.Add(FVector2D(0, 1));
 
 	GeneratePushedElevationIsland();
 
@@ -124,6 +116,10 @@ void AGameplayLevel::GenerateLevel() {
 	//Function that creates mesh section
 	terrain->cachedMesh->CreateMeshSection_LinearColor(0, vertices, triangles, normals, uvs, vertexColors, tangents, false);
 	//terrain->AddComponent(
+
+	//for (int i = 0; i < squares.Num(); i++)
+		//for (int j = 0; j < squares[i].Num(); j++)
+			//UE_LOG(LogTemp, Log, TEXT("#2 Current square: %d, %d, %d, %d"), squares[i][j].bottomLeft, squares[i][j].upperLeft, squares[i][j].bottomRight, squares[i][j].upperRight);
 }
 
 void AGameplayLevel::GeneratePushedElevationIsland() {
@@ -134,6 +130,15 @@ void AGameplayLevel::GeneratePushedElevationIsland() {
 	UE_LOG(LogTemp, Log, TEXT("Formula Test: %d, Seed: %d"), 41, generationSeed);
 	for (int i = 0; i < verticeDimensionX; i++) {
 		int xFromCentral = FMath::Abs(centralX - i);
+		bool squareCanForm = true;
+
+		FVector2D left = FVector2D(i - 1, 0);
+
+		if (IsCoordinateWithinBounds(left))
+			squares.Add(TArray<MeshSquare>());
+
+		//UE_LOG(LogTemp, Log, TEXT("BL 2: %d, %d"), GetIndex(FVector2D(i, 0)), i);
+
 
 		for (int j = 0; j < verticeDimensionY; j++) {
 			int yFromCentral = FMath::Abs(centralY - j);
@@ -148,15 +153,26 @@ void AGameplayLevel::GeneratePushedElevationIsland() {
 			XOX
 			XXT
 			*/
-			FVector2D prev = FVector2D(i, j) - FVector2D(1, 1);
+			FVector2D bL = FVector2D(i, j) - FVector2D(1, 1);
 
-			if (!IsCoordinateWithinBounds(prev))
+			if (!IsCoordinateWithinBounds(bL))
 				continue;
 
-			int prevVerticeId = GetIndex(prev);
+			int prevVerticeId = GetIndex(bL);
 
 			if (CheckIfVerticeIsPeak(prevVerticeId))
 				peaks.Add(prevVerticeId);
+
+			// Creates a square if the mesh square is within bounds
+			FVector2D uL = FVector2D(i - 1, j);
+			FVector2D bR = FVector2D(i, j - 1);
+			FVector2D uR = FVector2D(i, j);
+
+			squares[squares.Num() - 1].Add(MeshSquare(GetIndex(bL), GetIndex(uL), GetIndex(bR), GetIndex(uR)));
+
+			//if (IsCoordinateWithinBounds(uL) && IsCoordinateWithinBounds(bR) && IsCoordinateWithinBounds(uR))
+				//squares.Add(MeshSquare(GetIndex(bL), GetIndex(uL), GetIndex(bR), GetIndex(uR)));
+
 
 			//if (BiomeCheckNeighbourVertice(currVertice, FVector2D(0.f, -1.f))) continue;
 			//if (BiomeCheckNeighbourVertice(currVertice, FVector2D(-1.f, -1.f))) continue;
@@ -174,6 +190,8 @@ void AGameplayLevel::GeneratePushedElevationIsland() {
 			//currentBiomes++;
 		}
 	}
+
+
 }
 
 /*void AGameplayLevel::ChangeMenuWidget(TSubclassOf<UUserWidget> NewWidgetClass) {

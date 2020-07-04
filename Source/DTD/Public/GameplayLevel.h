@@ -9,8 +9,8 @@
 #include "Engine/World.h"
 #include "DrawDebugHelpers.h"
 #include "TerrainChunk.h"
+#include "MeshSquare.h"
 #include "GameplayLevel.generated.h"
-
 
 /**
  *
@@ -60,7 +60,6 @@ private:
 	float ElevationClamp(FVector vectorFromCenter, float elevation);
 	void GetCoordinatePosition(int index, FVector2D* coordinates);
 	int GetIndex(FVector2D coordinates);
-	void ClearMeshData();
 	bool CheckIfVerticeIsPeak(int vertice);
 	bool IsCoordinateWithinBounds(FVector2D coordinate);
 
@@ -82,8 +81,7 @@ private:
 	TArray<FVector2D> directions;
 	TArray<FVector2D> squareBase;
 	TArray<FVector2D> squareDir;
-
-
+	TArray<TArray<MeshSquare>> squares;
 
 protected:
 	/** Called when the game starts. */
