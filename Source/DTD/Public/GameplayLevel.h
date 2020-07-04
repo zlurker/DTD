@@ -79,10 +79,19 @@ private:
 		TArray<FProcMeshTangent> tangents;
 
 	TArray<FVector2D> peaks;
+	//TArray<int> actualPeakId;
+	//TArray<TArray<FVector2D>> biomeRegions;
+
 	TArray<FVector2D> directions;
 	TArray<FVector2D> squareBase;
 	TArray<FVector2D> squareDir;
-	TArray<TArray<MeshSquare*>> squares;
+
+	TArray<int> bottomLeft;
+	TArray<int> upperLeft;
+	TArray<int> bottomRight;
+	TArray<int> upperRight;
+	//TArray<TArray<MeshSquare*>> squares;
+	
 
 protected:
 	/** Called when the game starts. */

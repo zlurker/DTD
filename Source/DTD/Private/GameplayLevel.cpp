@@ -44,68 +44,78 @@ void AGameplayLevel::GenerateLevel() {
 	GeneratePushedElevationIsland();
 
 	uvs.Init(FVector2D(0, 0), verticeDimensionX * verticeDimensionY);
-	TArray<bool> set;
-	set.Init(false, verticeDimensionX * verticeDimensionY);
+	//set.Init(false, verticeDimensionX * verticeDimensionY);
 
 	int exp = 0;
 
 	UE_LOG(LogTemp, Log, TEXT("Starting with %d peaks"), peaks.Num());
 	int ultiTotal = 0;
 
+	biomeRegions.Init(TArray<FVector2D>(), peaks.Num());
+
 	while (peaks.Num() > 0) {
-		for (int i = peaks.Num() - 1; i >= 0; i--) {
-			int lenOfSquare = 1 + (exp * 2);
-			int totalFilled = 0;
-			//FVector2D peakLocation;
+		int i = 0;
+		//for (int i = peaks.Num() - 1; i >= 0; i--) {
+		int lenOfSquare = 1 + (exp * 2);
+		int totalFilled = 0;
+		//FVector2D peakLocation;
 
-			//GetCoordinatePosition(peaks[i], &peakLocation);
+		//GetCoordinatePosition(peaks[i], &peakLocation);
 
-			for (int j = 0; j < 4; j++) {
-				FVector2D baseOffset = (squareBase[j] * exp);
+		for (int j = 0; j < 4; j++) {
+			FVector2D baseOffset = peaks[i] + (squareBase[j] * exp);
 
-				for (int k = 0; k < lenOfSquare; k++) {
-					FVector2D currPos = peaks[i] + baseOffset + (squareDir[j] * k);
+			for (int k = 0; k < lenOfSquare; k++) {
+				FVector2D currPos = baseOffset + (squareDir[j] * k);
 
-					UE_LOG(LogTemp, Log, TEXT("PeakPos X: %f, Y: %f"), peaks[i].X, peaks[i].Y);
-					//UE_LOG(LogTemp, Log, TEXT("CurrPos X: %f, Y: %f"), currPos.X, currPos.Y);
+				//UE_LOG(LogTemp, Log, TEXT("PeakPos X: %f, Y: %f"), peaks[i].X, peaks[i].Y);
+				//UE_LOG(LogTemp, Log, TEXT("CurrPos X: %f, Y: %f"), currPos.X, currPos.Y);
 
-					if (!IsSquareWithinBounds(currPos))
-						continue;
+				if (!IsSquareWithinBounds(currPos))
+					continue;
 
-					//int vertexIndex = GetIndex(currPos);
 
-					MeshSquare* sqrInst = squares[peaks[i].X][peaks[i].Y];
+				//int vertexIndex = GetIndex(currPos);
+				MeshSquare* sqrInst = squares[currPos.X][currPos.Y];
 
-					if (!sqrInst->sqrOccupied) {
-						float baseFloat = (float)(i % 5) / 5.f;
-						//UE_LOG(LogTemp, Log, TEXT("BF: %f"), baseFloat);
-						//FVector2D base = FVector2D(baseFloat, 0);
+				if (!sqrInst->sqrOccupied) {
+					biomeRegions[actualPeakId[i]].Add(currPos);
+					float baseFloat = (float)(i % 5) / 5.f;
+					//UE_LOG(LogTemp, Log, TEXT("BF: %f"), baseFloat);
+					FVector2D base = FVector2D(baseFloat, 0);
 
-						int uvX = (int)currPos.X % 2;
-						int uvY = (int)currPos.Y % 2;
+					uvs[sqrInst->bottomLeft] = base + FVector2D(sqrInst->bottomLeft % 2 * 0.2f, sqrInst->bottomLeft % 2);
+					uvs[sqrInst->upperLeft] = base + FVector2D(sqrInst->upperLeft % 2 * 0.2f, sqrInst->upperLeft % 2);
+					uvs[sqrInst->bottomRight] = base + FVector2D(sqrInst->bottomRight % 2 * 0.2f, sqrInst->bottomRight % 2);
+					uvs[sqrInst->upperRight] = base + FVector2D(sqrInst->upperRight % 2 * 0.2f, sqrInst->upperRight % 2);
 
-						uvs[sqrInst->bottomLeft] = FVector2D(baseFloat, 0);
-						uvs[sqrInst->upperLeft] = FVector2D(baseFloat, 1);
-						uvs[sqrInst->bottomRight] = FVector2D(baseFloat + 0.2f, 0);
-						uvs[sqrInst->upperRight] = FVector2D(baseFloat + 0.2f, 1);
-
-						//uvs[vertexIndex] = (base + (FVector2D(uvX *0.2f, uvY)));
-						totalFilled++;
-						sqrInst->sqrOccupied = true;
-					}
+					//uvs[vertexIndex] = (base + (FVector2D(uvX *0.2f, uvY)));*/
+					totalFilled++;
+					sqrInst->sqrOccupied = true;
 				}
 			}
-
-			ultiTotal += totalFilled;
-
-			if (totalFilled == 0)
-				peaks.RemoveAt(i);
 		}
+
+		ultiTotal += totalFilled;
+
+		if (totalFilled == 0) {
+			peaks.RemoveAt(i);
+			actualPeakId.RemoveAt(i);
+		}
+		//}
 
 		exp++;
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("Filled up %d times"), ultiTotal);
+	int internalAlloc = 0;
+
+	/*for (int i = 0; i < biomeRegions.Num(); i++) {
+		for (int j = 0; j < biomeRegions[i].Num(); j++) {
+			internalAlloc++;
+		}
+	}*/
+
+	UE_LOG(LogTemp, Log, TEXT("Total filled: %d"), ultiTotal);
 
 	for (int i = 0; i < verticeDimensionX - 1; i++)
 		for (int j = 0; j < verticeDimensionY - 1; j++) {
@@ -144,7 +154,9 @@ void AGameplayLevel::GeneratePushedElevationIsland() {
 	int centralY = verticeDimensionY / 2;
 	//currentBiomes = 0;
 
-	UE_LOG(LogTemp, Log, TEXT("Formula Test: %d, Seed: %d"), 46, generationSeed);
+	UE_LOG(LogTemp, Log, TEXT("Formula Test: %d, Seed: %d"), 47, generationSeed);
+
+	int totalGenerated = 0;
 	for (int i = 0; i < verticeDimensionX; i++) {
 		int xFromCentral = FMath::Abs(centralX - i);
 		bool squareCanForm = true;
@@ -184,10 +196,11 @@ void AGameplayLevel::GeneratePushedElevationIsland() {
 			int uR = GetIndex(FVector2D(i, j));
 
 			float avgYPos = (vertices[bL].Z + vertices[uL].Z + vertices[bR].Z + vertices[uR].Z) / 4.f;
-			UE_LOG(LogTemp, Log, TEXT("AVGYPOS: %f"),avgYPos);
+			//UE_LOG(LogTemp, Log, TEXT("AVGYPOS: %f"),avgYPos);
 
 			MeshSquare* inst = new MeshSquare(bL, uL, bR, uR, avgYPos);
-			squares[mSqrX].Push(inst);
+			squares[mSqrX].Add(inst);
+			totalGenerated++;
 			int mSqrY = squares[mSqrX].Num() - 1;
 
 			FVector2D sqrCoord = FVector2D(mSqrX - 1, mSqrY - 1);
@@ -200,6 +213,7 @@ void AGameplayLevel::GeneratePushedElevationIsland() {
 			if (CheckIfVerticeIsPeak(sqrCoord)) {
 				//UE_LOG(LogTemp, Log, TEXT("PRE-POS X: %f, Y: %f"), sqrCoord.X, sqrCoord.Y);
 				peaks.Add(sqrCoord);
+				actualPeakId.Add(actualPeakId.Num());
 			}
 
 			//if (IsCoordinateWithinBounds(uL) && IsCoordinateWithinBounds(bR) && IsCoordinateWithinBounds(uR))
@@ -221,6 +235,8 @@ void AGameplayLevel::GeneratePushedElevationIsland() {
 			//verticeAssignedBiome.Add(currentBiomes);
 			//currentBiomes++;
 		}
+
+		UE_LOG(LogTemp, Log, TEXT("generated sqr test %d"), totalGenerated);
 	}
 
 
@@ -271,7 +287,7 @@ bool AGameplayLevel::CheckIfVerticeIsPeak(FVector2D sqr) {
 		if (!IsSquareWithinBounds(combinedCoordinates))
 			continue;
 
-		UE_LOG(LogTemp, Log, TEXT("Ogpeak: %f DirPeak: %f"), squares[sqr.X][sqr.Y]->peak, squares[combinedCoordinates.X][combinedCoordinates.Y]->peak);
+		//UE_LOG(LogTemp, Log, TEXT("Ogpeak: %f DirPeak: %f"), squares[sqr.X][sqr.Y]->peak, squares[combinedCoordinates.X][combinedCoordinates.Y]->peak);
 		if (squares[combinedCoordinates.X][combinedCoordinates.Y]->peak >= squares[sqr.X][sqr.Y]->peak)
 			return false;
 	}

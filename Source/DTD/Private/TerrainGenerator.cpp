@@ -175,6 +175,7 @@ void ATerrainGenerator::Tick(float DeltaTime) {
 		TArray<bool> set;
 		set.Init(false, verticeDimensionX * verticeDimensionY);
 
+		int utotalFilled = 0;
 
 		for (int o = 0; o < exp; o++)
 			for (int i = peaks.Num() - 1; i >= 0; i--) {
@@ -194,7 +195,7 @@ void ATerrainGenerator::Tick(float DeltaTime) {
 							continue;
 
 						int vertexIndex = GetIndex(currPos);
-						
+
 
 						if (!set[vertexIndex]) {
 							float baseFloat = (float)(i % 5) / 5.f;
@@ -210,9 +211,12 @@ void ATerrainGenerator::Tick(float DeltaTime) {
 					}
 				}
 
+				utotalFilled += totalFilled;
 				if (totalFilled == 0)
 					peaks.RemoveAt(i);
 			}
+
+		UE_LOG(LogTemp, Log, TEXT("Total: %d"), utotalFilled);
 
 		exp++;
 
