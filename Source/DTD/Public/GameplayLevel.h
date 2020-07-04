@@ -58,11 +58,11 @@ public:
 private:
 	void GeneratePushedElevationIsland();
 	float ElevationClamp(FVector vectorFromCenter, float elevation);
-	void GetCoordinatePosition(int index, FVector2D* coordinates);
-	int GetIndex(FVector2D coordinates);
+	void GetCoordinatePosition(int index, FVector2D* coordinates, int dimensionX);
+	int GetIndex(FVector2D coordinates, int dimensionX);
 	bool CheckIfVerticeIsPeak(FVector2D sqr);
-	bool IsCoordinateWithinBounds(FVector2D coordinate);
-	bool IsSquareWithinBounds(FVector2D coordinate);
+	bool IsCoordinateWithinBounds(FVector2D coordinate, FVector2D dimension);
+	//bool IsSquareWithinBounds(FVector2D coordinate);
 
 private:
 	UPROPERTY()
@@ -78,7 +78,7 @@ private:
 	UPROPERTY()
 		TArray<FProcMeshTangent> tangents;
 
-	TArray<FVector2D> peaks;
+	TArray<int> peaks;
 	//TArray<int> actualPeakId;
 	//TArray<TArray<FVector2D>> biomeRegions;
 
@@ -90,8 +90,10 @@ private:
 	TArray<int> upperLeft;
 	TArray<int> bottomRight;
 	TArray<int> upperRight;
+	TArray<float> squarePeak;
+	TArray<bool> sqrOccupied;
 	//TArray<TArray<MeshSquare*>> squares;
-	
+
 
 protected:
 	/** Called when the game starts. */
