@@ -10,7 +10,7 @@
 class DTD_API MeshSquare
 {
 public:
-	MeshSquare(int bL, int uL, int bR, int uR);
+	MeshSquare(int bL, int uL, int bR, int uR, float p);
 	~MeshSquare();
 
 public:
@@ -18,4 +18,7 @@ public:
 	int upperLeft;
 	int bottomRight;
 	int upperRight;
+	float peak;
+	bool sqrOccupied;
+
 };

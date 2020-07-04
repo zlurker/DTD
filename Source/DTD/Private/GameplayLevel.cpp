@@ -49,39 +49,54 @@ void AGameplayLevel::GenerateLevel() {
 
 	int exp = 0;
 
+	UE_LOG(LogTemp, Log, TEXT("Starting with %d peaks"), peaks.Num());
+	int ultiTotal = 0;
+
 	while (peaks.Num() > 0) {
 		for (int i = peaks.Num() - 1; i >= 0; i--) {
 			int lenOfSquare = 1 + (exp * 2);
 			int totalFilled = 0;
-			FVector2D peakLocation;
+			//FVector2D peakLocation;
 
-			GetCoordinatePosition(peaks[i], &peakLocation);
+			//GetCoordinatePosition(peaks[i], &peakLocation);
 
 			for (int j = 0; j < 4; j++) {
 				FVector2D baseOffset = (squareBase[j] * exp);
 
 				for (int k = 0; k < lenOfSquare; k++) {
-					FVector2D currPos = peakLocation + baseOffset + (squareDir[j] * k);
+					FVector2D currPos = peaks[i] + baseOffset + (squareDir[j] * k);
 
-					if (!IsCoordinateWithinBounds(currPos))
+					UE_LOG(LogTemp, Log, TEXT("PeakPos X: %f, Y: %f"), peaks[i].X, peaks[i].Y);
+					//UE_LOG(LogTemp, Log, TEXT("CurrPos X: %f, Y: %f"), currPos.X, currPos.Y);
+
+					if (!IsSquareWithinBounds(currPos))
 						continue;
 
-					int vertexIndex = GetIndex(currPos);
+					//int vertexIndex = GetIndex(currPos);
 
+					MeshSquare* sqrInst = squares[peaks[i].X][peaks[i].Y];
 
-					if (!set[vertexIndex]) {
+					if (!sqrInst->sqrOccupied) {
 						float baseFloat = (float)(i % 5) / 5.f;
 						//UE_LOG(LogTemp, Log, TEXT("BF: %f"), baseFloat);
-						FVector2D base = FVector2D(baseFloat, 0);
+						//FVector2D base = FVector2D(baseFloat, 0);
 
 						int uvX = (int)currPos.X % 2;
 						int uvY = (int)currPos.Y % 2;
-						uvs[vertexIndex] = (base + (FVector2D(uvX *0.2f, uvY)));
+
+						uvs[sqrInst->bottomLeft] = FVector2D(baseFloat, 0);
+						uvs[sqrInst->upperLeft] = FVector2D(baseFloat, 1);
+						uvs[sqrInst->bottomRight] = FVector2D(baseFloat + 0.2f, 0);
+						uvs[sqrInst->upperRight] = FVector2D(baseFloat + 0.2f, 1);
+
+						//uvs[vertexIndex] = (base + (FVector2D(uvX *0.2f, uvY)));
 						totalFilled++;
-						set[vertexIndex] = true;
+						sqrInst->sqrOccupied = true;
 					}
 				}
 			}
+
+			ultiTotal += totalFilled;
 
 			if (totalFilled == 0)
 				peaks.RemoveAt(i);
@@ -89,6 +104,8 @@ void AGameplayLevel::GenerateLevel() {
 
 		exp++;
 	}
+
+	UE_LOG(LogTemp, Log, TEXT("Filled up %d times"), ultiTotal);
 
 	for (int i = 0; i < verticeDimensionX - 1; i++)
 		for (int j = 0; j < verticeDimensionY - 1; j++) {
@@ -127,7 +144,7 @@ void AGameplayLevel::GeneratePushedElevationIsland() {
 	int centralY = verticeDimensionY / 2;
 	//currentBiomes = 0;
 
-	UE_LOG(LogTemp, Log, TEXT("Formula Test: %d, Seed: %d"), 41, generationSeed);
+	UE_LOG(LogTemp, Log, TEXT("Formula Test: %d, Seed: %d"), 46, generationSeed);
 	for (int i = 0; i < verticeDimensionX; i++) {
 		int xFromCentral = FMath::Abs(centralX - i);
 		bool squareCanForm = true;
@@ -135,7 +152,9 @@ void AGameplayLevel::GeneratePushedElevationIsland() {
 		FVector2D left = FVector2D(i - 1, 0);
 
 		if (IsCoordinateWithinBounds(left))
-			squares.Add(TArray<MeshSquare>());
+			squares.Add(TArray<MeshSquare*>());
+
+		int mSqrX = squares.Num() - 1;
 
 		//UE_LOG(LogTemp, Log, TEXT("BL 2: %d, %d"), GetIndex(FVector2D(i, 0)), i);
 
@@ -153,22 +172,35 @@ void AGameplayLevel::GeneratePushedElevationIsland() {
 			XOX
 			XXT
 			*/
-			FVector2D bL = FVector2D(i, j) - FVector2D(1, 1);
+			FVector2D min = FVector2D(i, j) - FVector2D(1, 1);
 
-			if (!IsCoordinateWithinBounds(bL))
+			if (!IsCoordinateWithinBounds(min))
 				continue;
 
-			int prevVerticeId = GetIndex(bL);
-
-			if (CheckIfVerticeIsPeak(prevVerticeId))
-				peaks.Add(prevVerticeId);
-
 			// Creates a square if the mesh square is within bounds
-			FVector2D uL = FVector2D(i - 1, j);
-			FVector2D bR = FVector2D(i, j - 1);
-			FVector2D uR = FVector2D(i, j);
+			int bL = GetIndex(min);
+			int uL = GetIndex(FVector2D(i - 1, j));
+			int bR = GetIndex(FVector2D(i, j - 1));
+			int uR = GetIndex(FVector2D(i, j));
 
-			squares[squares.Num() - 1].Add(MeshSquare(GetIndex(bL), GetIndex(uL), GetIndex(bR), GetIndex(uR)));
+			float avgYPos = (vertices[bL].Z + vertices[uL].Z + vertices[bR].Z + vertices[uR].Z) / 4.f;
+			UE_LOG(LogTemp, Log, TEXT("AVGYPOS: %f"),avgYPos);
+
+			MeshSquare* inst = new MeshSquare(bL, uL, bR, uR, avgYPos);
+			squares[mSqrX].Push(inst);
+			int mSqrY = squares[mSqrX].Num() - 1;
+
+			FVector2D sqrCoord = FVector2D(mSqrX - 1, mSqrY - 1);
+
+			//UE_LOG(LogTemp, Log, TEXT("PRE-POS X: %f, Y: %f"), sqrCoord.X, sqrCoord.Y);
+
+			if (!IsSquareWithinBounds(sqrCoord))
+				continue;
+
+			if (CheckIfVerticeIsPeak(sqrCoord)) {
+				//UE_LOG(LogTemp, Log, TEXT("PRE-POS X: %f, Y: %f"), sqrCoord.X, sqrCoord.Y);
+				peaks.Add(sqrCoord);
+			}
 
 			//if (IsCoordinateWithinBounds(uL) && IsCoordinateWithinBounds(bR) && IsCoordinateWithinBounds(uR))
 				//squares.Add(MeshSquare(GetIndex(bL), GetIndex(uL), GetIndex(bR), GetIndex(uR)));
@@ -225,30 +257,22 @@ float AGameplayLevel::ElevationClamp(FVector vectorFromCenter, float elevation) 
 	return totalElevation;
 }
 
-bool AGameplayLevel::CheckIfVerticeIsPeak(int vertice) {
+bool AGameplayLevel::CheckIfVerticeIsPeak(FVector2D sqr) {
 
 	//UE_LOG(LogTemp, Log, TEXT("PRE: Vertice: %d, Direction X: %f, Y: %f"), vertice, direction.X, direction.Y);
-
-	FVector2D coordinates;
-
-	//FVector2D preTargetCoordinates;
-
-	GetCoordinatePosition(vertice, &coordinates);
-
 
 
 	for (int i = 0; i < directions.Num(); i++) {
 
 		//UE_LOG(LogTemp, Log, TEXT("Original Coords: X: %f, Y: %f"), coordinates.X, coordinates.Y);
 		//UE_LOG(LogTemp, Log, TEXT("Dir Coords: X: %f, Y: %f"), directions[i].X, directions[i].Y);
-		FVector2D combinedCoordinates = coordinates + directions[i];
+		FVector2D combinedCoordinates = sqr + directions[i];
 		//UE_LOG(LogTemp, Log, TEXT("Combined Coords: X: %f, Y: %f"), combinedCoordinates.X, combinedCoordinates.Y);
-
-		if (!IsCoordinateWithinBounds(combinedCoordinates))
+		if (!IsSquareWithinBounds(combinedCoordinates))
 			continue;
 
-		//UE_LOG(LogTemp, Log, TEXT("Peak test: %d: %f, %d: %f"), GetIndex(combinedCoordinates), vertices[GetIndex(combinedCoordinates)].Z, vertice, vertices[vertice].Z);
-		if (vertices[GetIndex(combinedCoordinates)].Z >= vertices[vertice].Z)
+		UE_LOG(LogTemp, Log, TEXT("Ogpeak: %f DirPeak: %f"), squares[sqr.X][sqr.Y]->peak, squares[combinedCoordinates.X][combinedCoordinates.Y]->peak);
+		if (squares[combinedCoordinates.X][combinedCoordinates.Y]->peak >= squares[sqr.X][sqr.Y]->peak)
 			return false;
 	}
 
@@ -266,6 +290,13 @@ int AGameplayLevel::GetIndex(FVector2D coordinates) {
 
 bool AGameplayLevel::IsCoordinateWithinBounds(FVector2D coordinate) {
 	if (coordinate.X < 0 || coordinate.Y < 0 || coordinate.X >= verticeDimensionX || coordinate.Y >= verticeDimensionY)
+		return false;
+
+	return true;
+}
+
+bool AGameplayLevel::IsSquareWithinBounds(FVector2D coordinate) {
+	if (coordinate.X < 0 || coordinate.Y < 0 || coordinate.X >= verticeDimensionX - 1 || coordinate.Y >= verticeDimensionY - 1)
 		return false;
 
 	return true;

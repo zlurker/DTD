@@ -60,8 +60,9 @@ private:
 	float ElevationClamp(FVector vectorFromCenter, float elevation);
 	void GetCoordinatePosition(int index, FVector2D* coordinates);
 	int GetIndex(FVector2D coordinates);
-	bool CheckIfVerticeIsPeak(int vertice);
+	bool CheckIfVerticeIsPeak(FVector2D sqr);
 	bool IsCoordinateWithinBounds(FVector2D coordinate);
+	bool IsSquareWithinBounds(FVector2D coordinate);
 
 private:
 	UPROPERTY()
@@ -77,11 +78,11 @@ private:
 	UPROPERTY()
 		TArray<FProcMeshTangent> tangents;
 
-	TArray<int> peaks;
+	TArray<FVector2D> peaks;
 	TArray<FVector2D> directions;
 	TArray<FVector2D> squareBase;
 	TArray<FVector2D> squareDir;
-	TArray<TArray<MeshSquare>> squares;
+	TArray<TArray<MeshSquare*>> squares;
 
 protected:
 	/** Called when the game starts. */
