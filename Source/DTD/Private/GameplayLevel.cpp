@@ -43,7 +43,7 @@ void AGameplayLevel::GenerateLevel() {
 
 	GeneratePushedElevationIsland();
 
-	uvs.Init(FVector2D(0, 0), verticeDimensionX * verticeDimensionY);
+	//uvs.Init(FVector2D(0, 0), verticeDimensionX * verticeDimensionY);
 	sqrOccupied.Init(false, bottomLeft.Num());
 
 	int exp = 0;
@@ -51,10 +51,20 @@ void AGameplayLevel::GenerateLevel() {
 	UE_LOG(LogTemp, Log, TEXT("Starting with %d peaks"), peaks.Num());
 	int ultiTotal = 0;
 
+	TArray<TArray<FVector2D>> biomeRegions;
+	TArray<int> originalMappedId;
+	originalMappedId.Init(0, peaks.Num());
+	biomeRegions.Init(TArray<FVector2D>(), peaks.Num());
+	//biomeRegions.Init(TArray<FVector2D>(), peaks.Num());
+
 	//biomeRegions.Init(TArray<FVector2D>(), peaks.Num());
 
 	while (peaks.Num() > 0) {
 		for (int i = peaks.Num() - 1; i >= 0; i--) {
+
+			if (exp == 0)
+				originalMappedId[i] = i;
+
 			int lenOfSquare = 1 + (exp * 2);
 			int totalFilled = 0;
 			FVector2D peakLocation;
@@ -78,8 +88,10 @@ void AGameplayLevel::GenerateLevel() {
 					int selectedSqr = GetIndex(currPos, verticeDimensionX - 1);
 
 					if (!sqrOccupied[selectedSqr]) {
+
+						biomeRegions[originalMappedId[i]].Add(currPos);
 						//biomeRegions[actualPeakId[i]].Add(currPos);
-						float baseFloat = (float)(i % 5) / 5.f;
+						/*float baseFloat = (float)(i % 5) / 5.f;
 						//UE_LOG(LogTemp, Log, TEXT("BF: %f"), baseFloat);
 						FVector2D base = FVector2D(baseFloat, 0);
 						FVector2D bL, uL, bR, uR;
@@ -105,22 +117,69 @@ void AGameplayLevel::GenerateLevel() {
 
 			if (totalFilled == 0) {
 				peaks.RemoveAt(i);
-				//actualPeakId.RemoveAt(i);
+				originalMappedId.RemoveAt(i);
 			}
 		}
 
 		exp++;
 	}
 
-	int internalAlloc = 0;
 
-	/*for (int i = 0; i < biomeRegions.Num(); i++) {
+
+
+	for (int i = 0; i < biomeRegions.Num(); i++) {
+
+		TArray<FVector> regionVertice;
+		TArray<int> regionVerticeTri;
+		TArray<FVector> normals;
+		TArray<int32> triangles;
+		TArray<FVector2D> uvs;
+		TArray<FLinearColor> vertexColors;
+		TArray<FProcMeshTangent> tangents;
+		TMap<int, int> squareVerticeMapper;
+
 		for (int j = 0; j < biomeRegions[i].Num(); j++) {
-			internalAlloc++;
-		}
-	}*/
 
-	UE_LOG(LogTemp, Log, TEXT("Total filled: %d"), ultiTotal);
+			int index = GetIndex(biomeRegions[i][j], verticeDimensionX - 1);
+			TArray<int> sqrVertices;
+
+			sqrVertices.Add(bottomLeft[index]);
+			sqrVertices.Add(upperLeft[index]);
+			sqrVertices.Add(bottomRight[index]);
+			sqrVertices.Add(upperRight[index]);
+
+			for (int k = 0; k < sqrVertices.Num(); k++) {
+				if (!squareVerticeMapper.Contains(index)) {
+					int prev = squareVerticeMapper.Num();
+					regionVertice.Add(vertices[sqrVertices[k]]);
+					squareVerticeMapper.Add(index, prev);
+					sqrVertices[k] = prev;
+				}
+				else
+					sqrVertices[k] = squareVerticeMapper[index];
+				//internalIndex = squareVerticeMapper[index];
+			}
+
+			triangles.Add(sqrVertices[0]);
+			triangles.Add(sqrVertices[1]);
+			triangles.Add(sqrVertices[2]);
+
+			triangles.Add(sqrVertices[3]);
+			triangles.Add(sqrVertices[2]);
+			triangles.Add(sqrVertices[1]);
+		}
+
+		normals.Init(FVector(0.0f, 0.0f, 1.0f), regionVertice.Num());
+		vertexColors.Init(FLinearColor(0.0f, 0.0f, 0.0f, 1.0f), regionVertice.Num());
+		tangents.Init(FProcMeshTangent(1.0f, 0.0f, 0.0f), regionVertice.Num());
+		uvs.Init(FVector2D(0, 0), regionVertice.Num());
+
+		//Function that creates mesh section
+		ATerrainChunk* biomeChunk = GetWorld()->SpawnActor<ATerrainChunk>(ATerrainChunk::StaticClass());
+		biomeChunk->cachedMesh->CreateMeshSection_LinearColor(0, vertices, triangles, normals, uvs, vertexColors, tangents, false);
+	}
+
+	/*UE_LOG(LogTemp, Log, TEXT("Total filled: %d"), ultiTotal);
 
 	for (int i = 0; i < verticeDimensionX - 1; i++)
 		for (int j = 0; j < verticeDimensionY - 1; j++) {
@@ -151,7 +210,7 @@ void AGameplayLevel::GenerateLevel() {
 
 	//for (int i = 0; i < squares.Num(); i++)
 		//for (int j = 0; j < squares[i].Num(); j++)
-			//UE_LOG(LogTemp, Log, TEXT("#2 Current square: %d, %d, %d, %d"), squares[i][j].bottomLeft, squares[i][j].upperLeft, squares[i][j].bottomRight, squares[i][j].upperRight);
+			//UE_LOG(LogTemp, Log, TEXT("#2 Current square: %d, %d, %d, %d"), squares[i][j].bottomLeft, squares[i][j].upperLeft, squares[i][j].bottomRight, squares[i][j].upperRight);*/
 }
 
 void AGameplayLevel::GeneratePushedElevationIsland() {

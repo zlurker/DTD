@@ -23,6 +23,9 @@ class DTD_API AGameplayLevel : public AGameModeBase
 		/** General settings. */
 public:
 
+	
+
+
 	AGameplayLevel();
 
 	UFUNCTION(BlueprintCallable, Category = "UMG Game")
@@ -67,7 +70,7 @@ private:
 private:
 	UPROPERTY()
 		TArray<FVector> vertices;
-	UPROPERTY()
+	/*UPROPERTY()
 		TArray<FVector> normals;
 	UPROPERTY()
 		TArray<int32> triangles;
@@ -76,10 +79,10 @@ private:
 	UPROPERTY()
 		TArray<FLinearColor> vertexColors;
 	UPROPERTY()
-		TArray<FProcMeshTangent> tangents;
+		TArray<FProcMeshTangent> tangents;*/
 
 	TArray<int> peaks;
-	//TArray<int> actualPeakId;
+	TArray<int> actualPeakId;
 	//TArray<TArray<FVector2D>> biomeRegions;
 
 	TArray<FVector2D> directions;
