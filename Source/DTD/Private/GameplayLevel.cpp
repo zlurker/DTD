@@ -149,24 +149,24 @@ void AGameplayLevel::GenerateLevel() {
 			sqrVertices.Add(upperRight[index]);
 
 			for (int k = 0; k < sqrVertices.Num(); k++) {
-				if (!squareVerticeMapper.Contains(index)) {
+				if (!squareVerticeMapper.Contains(sqrVertices[k])) {
 					int prev = squareVerticeMapper.Num();
 					regionVertice.Add(vertices[sqrVertices[k]]);
-					squareVerticeMapper.Add(index, prev);
+					squareVerticeMapper.Add(sqrVertices[k], prev);
 					sqrVertices[k] = prev;
 				}
 				else
-					sqrVertices[k] = squareVerticeMapper[index];
+					sqrVertices[k] = squareVerticeMapper[sqrVertices[k]];
 				//internalIndex = squareVerticeMapper[index];
 			}
 
-			triangles.Add(sqrVertices[0]);
-			triangles.Add(sqrVertices[1]);
-			triangles.Add(sqrVertices[2]);
+			regionVerticeTri.Add(sqrVertices[0]);
+			regionVerticeTri.Add(sqrVertices[1]);
+			regionVerticeTri.Add(sqrVertices[2]);
 
-			triangles.Add(sqrVertices[3]);
-			triangles.Add(sqrVertices[2]);
-			triangles.Add(sqrVertices[1]);
+			regionVerticeTri.Add(sqrVertices[3]);
+			regionVerticeTri.Add(sqrVertices[2]);
+			regionVerticeTri.Add(sqrVertices[1]);
 		}
 
 		normals.Init(FVector(0.0f, 0.0f, 1.0f), regionVertice.Num());
@@ -176,7 +176,7 @@ void AGameplayLevel::GenerateLevel() {
 
 		//Function that creates mesh section
 		ATerrainChunk* biomeChunk = GetWorld()->SpawnActor<ATerrainChunk>(ATerrainChunk::StaticClass());
-		biomeChunk->cachedMesh->CreateMeshSection_LinearColor(0, vertices, triangles, normals, uvs, vertexColors, tangents, false);
+		biomeChunk->cachedMesh->CreateMeshSection_LinearColor(0, regionVertice, regionVerticeTri, normals, uvs, vertexColors, tangents, false);
 	}
 
 	/*UE_LOG(LogTemp, Log, TEXT("Total filled: %d"), ultiTotal);
@@ -218,7 +218,7 @@ void AGameplayLevel::GeneratePushedElevationIsland() {
 	int centralY = verticeDimensionY / 2;
 	//currentBiomes = 0;
 
-	UE_LOG(LogTemp, Log, TEXT("Formula Test: %d, Seed: %d"), 48, generationSeed);
+	UE_LOG(LogTemp, Log, TEXT("Formula Test: %d, Seed: %d"), 51, generationSeed);
 
 	int totalGenerated = 0;
 	for (int i = 0; i < verticeDimensionX; i++) {
@@ -313,7 +313,7 @@ void AGameplayLevel::GeneratePushedElevationIsland() {
 			//currentBiomes++;
 		}
 
-		UE_LOG(LogTemp, Log, TEXT("generated sqr test %d"), totalGenerated);
+		//UE_LOG(LogTemp, Log, TEXT("generated sqr test %d"), totalGenerated);
 	}
 
 
